@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>AAX_AxPurchLine_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(classStr(AxPurchLine))]
+internal final class AAX_AxPurchLine_Extension //implements AAX_AxInventLocationDimensionable
+{
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>setDefaultDimension</Name>
+				<Source><![CDATA[
+    protected void setDefaultDimension()
+    {
+        this.AAX_InventLocationDimensionLink().axSetDefaultDimension(this);
+
+        next setDefaultDimension();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>AAX_InventLocationDimensionLink</Name>
+				<Source><![CDATA[
+    protected AAX_InventLocationDimensionLink AAX_InventLocationDimensionLink()
+    {
+        return AAX_InventLocationDimensionLink::newDimensionTables(this.purchLine(), this.axInventDim().inventDim());
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

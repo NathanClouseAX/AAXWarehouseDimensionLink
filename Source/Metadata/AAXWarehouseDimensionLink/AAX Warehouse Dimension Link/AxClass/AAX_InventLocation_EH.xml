@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>AAX_InventLocation_EH</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+class AAX_InventLocation_EH
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>InventLocation_Post_insert</Name>
+				<Source><![CDATA[
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="args"></param>
+    [PostHandlerFor(tableStr(InventLocation), tableMethodStr(InventLocation, insert))]
+    public static void InventLocation_Post_insert(XppPrePostArgs args)
+    {
+        InventLocation    InventLocation    =   args.getThis();
+
+        DimensionDefaultFacade::copyDimensionValueToDefaultDimensionField(InventLocation, fieldNum(InventLocation, InventLocationId), InventLocation, fieldNum(InventLocation, AAX_DefaultDimension));
+   
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

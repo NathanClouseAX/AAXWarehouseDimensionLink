@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>AAX_DimensionCopy_SiteActive_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(classStr(DimensionCopy_SiteActive))]
+public final class  AAX_DimensionCopy_SiteActive_Extension
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>copy</Name>
+				<Source><![CDATA[
+    DimensionDefault copy(DimensionDefault _defaultDimension)
+    {
+       
+        DimensionDefault    LocationDimension;
+        InventParameters    InventParameters = InventParameters::find();
+
+        DimensionDefault    dimension = next copy(_defaultDimension);
+
+        //re-apply any inventLocation dimension if active
+        if(!InventParameters.AAX_isLocationDimensionLinkInactive())
+        {
+            changecompany(this.parmLegalEntityDataAreaId())
+            {
+                Name                warehouseDimensionAttributeName = DimensionAttribute::find(inventParameters.AAX_LocationDimensionAttribute).Name;
+                DimensionAttributeValueSet warehouseDimensionAttributeValue = DimensionAttributeValueSet::find(_defaultDimension);
+                FieldId fieldId = DimensionAttributeValueSet::getDimensionValueFieldId(warehouseDimensionAttributeName);
+                boolean hasWarehouseDimensionAttributeValue = warehouseDimensionAttributeValue.(fieldId);
+                
+
+
+                dimension = LedgerDimensionDefaultFacade::serviceReplaceAttributeValue(
+                            dimension,
+                            dimensionDefaultMap.DefaultDimension,
+                            (!hasWarehouseDimensionAttributeValue || inventParameters.AAX_InventLocationDimensionLink == InventMultiSiteDimensionLink::Locked) ? inventParameters.AAX_LocationDimensionAttribute : 0);
+            }
+        }
+
+        return dimension;
+
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

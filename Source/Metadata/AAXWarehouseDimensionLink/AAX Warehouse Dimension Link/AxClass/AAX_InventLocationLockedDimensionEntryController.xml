@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>AAX_InventLocationLockedDimensionEntryController</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+/// <summary>
+/// The <c>InventLocationLockedDimensionEntryController</c> class provides support for data entry in the dimension entry control for the
+/// <c>InventLocation</c> form.
+/// </summary>
+[System.ComponentModel.Composition.ExportMetadataAttribute(extendedtypestr(ExtendedDataTypeName), extendedtypestr(AAX_InventLocationLockedDimensionValueSet)),
+ System.ComponentModel.Composition.ExportAttribute(identifierstr(Dynamics.AX.Application.DimensionEntryController))]
+public class AAX_InventLocationLockedDimensionEntryController extends LedgerDimensionEntryController
+{
+    boolean preventEditLinkedForExistingRecords;
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>construct</Name>
+				<Source><![CDATA[
+    public static AAX_InventLocationLockedDimensionEntryController construct()
+    {
+        AAX_InventLocationLockedDimensionEntryController controller = new AAX_InventLocationLockedDimensionEntryController();
+        controller.initialize();
+        return controller;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>onCompanyChange</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Updates the controller when the company changes.
+    /// </summary>
+    protected void onCompanyChange()
+    {
+        super();
+
+        changecompany (company)
+        {
+            InventParameters inventParameters = InventParameters::find();
+            DimensionAttributeRecId linkedDimAttributeId = inventParameters.AAX_LocationDimensionAttribute;
+
+            if (linkedDimAttributeId)
+            {
+                DimensionAttribute dimAttribute = DimensionAttribute::find(linkedDimAttributeId);
+                DimensionAttributeSetStorage singleAttributeSetStorage = new DimensionAttributeSetStorage();
+                singleAttributeSetStorage.addItem(dimAttribute.RecId, dimAttribute.HashKey, NoYes::Yes);
+
+                this.parmDimensionsToDisplay(singleAttributeSetStorage.save());
+
+                preventEditLinkedForExistingRecords =
+                    (inventParameters.AAX_InventLocationDimensionLink == InventMultiSiteDimensionLink::Locked);
+            }
+            else
+            {
+                this.parmDimensionsToDisplay(0);
+
+                preventEditLinkedForExistingRecords = false;
+            }
+
+            this.updateDimensionsToAllowEdit();
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>onValueSetLoad</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Updates the controller when the displayed value set changes.
+    /// </summary>
+    /// <returns>
+    /// true if the controller parameters were changed; otherwise, false.
+    /// </returns>
+    public boolean onValueSetLoad()
+    {
+        DimensionEnumeration oldDimensionsToAllowEdit = this.parmDimensionsToAllowEdit();
+
+        this.updateDimensionsToAllowEdit();
+
+        return this.parmDimensionsToAllowEdit() != oldDimensionsToAllowEdit;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>updateDimensionsToAllowEdit</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Updates the set of dimensions that are editable in the control.
+    /// </summary>
+    private void updateDimensionsToAllowEdit()
+    {
+        if (preventEditLinkedForExistingRecords &&
+            this.parmDataSource())
+            //this.parmDataSource().cursor().RecId)
+        {
+            this.parmDimensionsToAllowEdit(0);
+        }
+        else
+        {
+            this.parmDimensionsToAllowEdit(this.parmDimensionsToDisplay());
+        }
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

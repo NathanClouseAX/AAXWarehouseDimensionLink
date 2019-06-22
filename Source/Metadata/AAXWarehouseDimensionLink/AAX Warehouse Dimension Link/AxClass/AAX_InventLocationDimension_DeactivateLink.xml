@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>AAX_InventLocationDimension_DeactivateLink</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+public class AAX_InventLocationDimension_DeactivateLink
+{
+    InventParameters    InventParameters;
+    dimensionAttribute  dimensionAttribute;
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>new</Name>
+				<Source><![CDATA[
+    protected void new()
+    {
+        InventParameters    = InventParameters::find();
+        
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>run</Name>
+				<Source><![CDATA[
+    /// <summary>
+    ///    Contains the code that does the actual job of the class.
+    /// </summary>
+    public void run()
+    {
+        #OCCRetryCount
+
+        if (!this.validate())
+            return;
+
+        try
+        {
+            ttsbegin;
+
+            InventParameters = InventParameters::find(true);
+            InventParameters.AAX_InventLocationDimensionLink = InventMultiSiteDimensionLink::Inactive;
+            InventParameters.update();
+
+            ttscommit;
+        }
+        catch (Exception::Deadlock)
+        {
+            retry;
+        }
+        catch (Exception::UpdateConflict)
+        {
+            if (appl.ttsLevel() == 0)
+            {
+                if (xSession::currentRetryCount() >= #RetryNum)
+                    throw Exception::UpdateConflictNotRecovered;
+                else
+                    retry;
+            }
+            else
+            {
+                throw Exception::UpdateConflict;
+            }
+        }
+        catch(Exception::Error)
+        {
+            throw Error("Update Cancelled");
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>validate</Name>
+				<Source><![CDATA[
+    public boolean validate()
+    {
+        boolean ret = true;
+
+        InventParameters = InventParameters::find();
+
+        if (ret && !InventParameters.AAX_allowDeactivateLocationDimensionLink())
+        {
+            ret = checkFailed("@SYS109421");
+        }
+
+        return ret;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>construct</Name>
+				<Source><![CDATA[
+    public static AAX_InventLocationDimension_DeactivateLink construct()
+    {
+        return new AAX_InventLocationDimension_DeactivateLink();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>main</Name>
+				<Source><![CDATA[
+    public static void main(Args args)
+    {
+        AAX_InventLocationDimension_DeactivateLink    AAX_InventLocationDimension_DeactivateLink = AAX_InventLocationDimension_DeactivateLink::construct();
+
+        AAX_InventLocationDimension_DeactivateLink.run();
+
+        if (args)
+        {
+            Common common = args.record();
+            if (FormDataUtil::isFormDataSource(common))
+            {
+                FormDataSource formDataSource = FormDataUtil::getFormDataSource(common);
+                formDataSource.executeQuery();
+            }
+
+            
+        }
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

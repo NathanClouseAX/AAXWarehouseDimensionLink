@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>AAX_InventLocationDimensionLink_Null</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+class AAX_InventLocationDimensionLink_Null extends AAX_inventLocationDimensionLink
+{
+    SysDictField    sysDictField;
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>axParmDefaultDimensionSet</Name>
+				<Source><![CDATA[
+    public void axParmDefaultDimensionSet(AxInventSiteDimensionable _AxInventLocationDimensionable, DimensionDefault _dimension)
+    {
+        _AxInventLocationDimensionable.setDefaultDimensionValue(_dimension);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>axSetDefaultDimension</Name>
+				<Source><![CDATA[
+    public void axSetDefaultDimension(AxInventSiteDimensionable _AxInventLocationDimensionable, boolean _forceDefaultDimensionChanges = false)
+    {
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>linkDimension</Name>
+				<Source><![CDATA[
+        public void linkDimension()
+    {
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>construct</Name>
+				<Source><![CDATA[
+    protected static AAX_InventLocationDimensionLink_Null construct()
+    {
+        return new AAX_InventLocationDimensionLink_Null();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>newStandard</Name>
+				<Source><![CDATA[
+    public static AAX_InventLocationDimensionLink_Null newStandard()
+    {
+        return AAX_InventLocationDimensionLink_Null::construct();
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

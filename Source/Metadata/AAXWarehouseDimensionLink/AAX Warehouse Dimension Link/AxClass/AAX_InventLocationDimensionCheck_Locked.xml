@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>AAX_InventLocationDimensionCheck_Locked</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+class AAX_InventLocationDimensionCheck_Locked extends AAX_InventLocationDimensionCheck
+{
+    InventLocation          InventLocation;
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>checkDimensions</Name>
+				<Source><![CDATA[
+    public boolean checkDimensions(InventDim _inventDim, DimensionDefault _dimension)
+    {
+        boolean ok = true;
+        RecId   dimensionValue;
+
+        if (InventLocation.InventLocationId != _inventDim.InventLocationId)
+        {
+            InventLocation = _inventDim.inventLocation();
+        }
+
+        dimensionValue = this.locationDimensionAttributeValue(_dimension);
+
+        if (dimensionValue != InventLocation.AAX_dimensionAttributeValue())
+        {
+            ok = checkFailed(strFmt("@SYS110623", DimensionAttributeValue::find(dimensionValue).getValue(), InventLocation.InventLocationId));
+        }
+
+        return ok;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>new</Name>
+				<Source><![CDATA[
+    protected void new()
+    {
+        super();
+
+        InventParameters    = InventParameters::find();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>locationDimensionAttributeValue</Name>
+				<Source><![CDATA[
+    private RecId locationDimensionAttributeValue(DimensionDefault _dimension)
+    {
+        DimensionAttributeValueSetStorage   valueSetStorage;
+
+        valueSetStorage = DimensionAttributeValueSetStorage::find(_dimension);
+
+        return valueSetStorage.getValueByDimensionAttribute(InventParameters.AAX_LocationDimensionAttribute);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>construct</Name>
+				<Source><![CDATA[
+    static public AAX_InventLocationDimensionCheck_Locked construct()
+    {
+        return new AAX_InventLocationDimensionCheck_Locked();
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxMenuItemAction xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="Microsoft.Dynamics.AX.Metadata.V1">
+	<Name>AAX_InventLocationDimensionUpdate</Name>
+	<HelpText>@SYS338257</HelpText>
+	<Label>@SYS111444</Label>
+	<Object>AAX_InventLocationDimensionUpdate</Object>
+	<ObjectType>Class</ObjectType>
+	<SubscriberAccessLevel>
+		<Read xmlns="">Allow</Read>
+	</SubscriberAccessLevel>
+</AxMenuItemAction>

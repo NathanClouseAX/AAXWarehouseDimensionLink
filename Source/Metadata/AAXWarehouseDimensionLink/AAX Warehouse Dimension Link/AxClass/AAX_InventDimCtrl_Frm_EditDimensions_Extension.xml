@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>AAX_InventDimCtrl_Frm_EditDimensions_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(classStr(InventDimCtrl_Frm_EditDimensions))]
+final class AAX_InventDimCtrl_Frm_EditDimensions_Extension
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>mustEnableField</Name>
+				<Source><![CDATA[
+    protected NoYes mustEnableField(
+        fieldId         _dimFieldId,
+        InventDimParm   _dimParmEnabled)
+    {
+        NoYes ret = next mustEnableField(_dimFieldId, _dimParmEnabled);
+
+        if (_dimFieldId == fieldnum(InventDim, InventLocationId) && inventParameters.AAX_InventLocationDimensionLink == InventMultiSiteDimensionLink::Locked)
+        {
+            ret = NoYes::No;
+        }
+
+        return(ret);
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

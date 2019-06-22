@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>AAX_InventSiteLinkedDimensionEntryController_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(classStr(InventSiteLinkedDimensionEntryController))]
+final class AAX_InventSiteLinkedDimensionEntryController_Extension
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>onCompanyChange</Name>
+				<Source><![CDATA[
+    protected void onCompanyChange()
+    {
+        next onCompanyChange();
+
+        changecompany (company)
+        {
+            InventParameters inventParameters = InventParameters::find();
+
+            //Site
+            DimensionAttributeRecId linkedDimAttributeId = inventParameters.SiteDimensionAttribute;
+            boolean preventEdit = (inventParameters.MultiSiteDimensionLink == InventMultiSiteDimensionLink::Locked);
+            //Warehouse
+            DimensionAttributeRecId linkedDimAttributeIdWarehouse = inventParameters.AAX_LocationDimensionAttribute;
+            boolean preventEditWarehouse = (inventParameters.AAX_InventLocationDimensionLink == InventMultiSiteDimensionLink::Locked);
+
+            if ((linkedDimAttributeIdWarehouse && preventEditWarehouse))
+            {
+                DimensionAttributeSetStorage editableDimensionSetStorage =
+                    DimensionAttributeSetStorage::find(this.parmDimensionsToDisplay());
+
+                editableDimensionSetStorage.removeDimensionAttribute(linkedDimAttributeIdWarehouse);
+
+                if (linkedDimAttributeId && preventEdit)
+                {
+                    //DimensionAttributeSetStorage editableDimensionSetStorage =
+                    //DimensionAttributeSetStorage::find(this.parmDimensionsToDisplay());
+
+                    editableDimensionSetStorage.removeDimensionAttribute(linkedDimAttributeId);
+                    //DimensionEnumeration editableDimensionSet = editableDimensionSetStorage.save();
+
+                    //this.parmDimensionsToAllowEdit(editableDimensionSet);
+                }
+
+                DimensionEnumeration editableDimensionSet = editableDimensionSetStorage.save();
+
+                this.parmDimensionsToAllowEdit(editableDimensionSet);
+            }
+
+        }
+
+        //next onCompanyChange();
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

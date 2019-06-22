@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>AAX_InventLocationDimensionLink</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+abstract class AAX_InventLocationDimensionLink
+{
+    Common      storageDimTable;
+    FieldId     inventLocationIdFieldId;
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>axParmDefaultDimensionSet</Name>
+				<Source><![CDATA[
+    abstract public void axParmDefaultDimensionSet(AxInventSiteDimensionable _AxInventLocationDimensionable, DimensionDefault _dimension)
+    {
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>axSetDefaultDimension</Name>
+				<Source><![CDATA[
+    abstract public void axSetDefaultDimension(AxInventSiteDimensionable _AxInventLocationDimensionable, boolean _forceDefaultDimensionChanges = false)
+    {
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>linkDimension</Name>
+				<Source><![CDATA[
+    abstract public void linkDimension()
+    {
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>new</Name>
+				<Source><![CDATA[
+    protected void new()
+    {
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>parmInventLocationIdFieldId</Name>
+				<Source><![CDATA[
+    protected FieldId parmInventLocationIdFieldId(FieldId _inventLocationIdFieldId = inventLocationIdFieldId)
+    {
+        inventLocationIdFieldId = _inventLocationIdFieldId;
+        return inventLocationIdFieldId;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>parmStorageDimTable</Name>
+				<Source><![CDATA[
+    protected Common parmStorageDimTable(Common _storageDimTable = storageDimTable)
+    {
+        storageDimTable = _storageDimTable;
+        return storageDimTable;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>newDimensionTables</Name>
+				<Source><![CDATA[
+    static public AAX_inventLocationDimensionLink newDimensionTables(Common _financialDimensionTable, Common _storageDimTable)
+    {
+        AAX_inventLocationDimensionLink inventLocationDimensionLink = null;
+        FieldId                 dimensionFieldId    = 0;
+        FieldId                 inventLocationIdFIeldId = 0;
+        FormDataSource          formDataSource;
+        boolean                 useLocationLink;
+
+        useLocationLink = InventLocation::AAX_useLocationLink(_financialDimensionTable);
+
+        switch(_storageDimTable.TableId)
+        {
+            case TableNum(CustTable):
+            case tableNum(VendTable):
+                inventLocationIdFieldId = fieldName2id(_storageDimTable.TableId, identifierStr(InventLocation));      
+                break;
+
+            //cover SalesTable, PurchTable, PurchRFQTable, PurchRFQCaseTable, VendInvoiceInfoTable
+            default:
+                inventLocationIdFieldId = fieldName2id(_storageDimTable.TableId, extendedTypeStr(InventLocationId));
+                break;
+        }
+
+        if(inventLocationIdFieldId == 0)
+        {
+            Info(strFmt("no field match for %", tableId2Name(_storageDimTable.TableId)));
+        }
+
+        switch (_financialDimensionTable.TableId)
+        {
+            case tableNum(InventJournalTrans):
+            if (useLocationLink)
+                {
+                    if (_storageDimTable.isFormDataSource())
+                    {
+                        formDataSource = _storageDimTable.dataSource();
+                        if (formDataSource.name() == identifierStr(InventDimReceipt))
+                        {
+                            useLocationLink = false;
+                        }
+                    }
+                }
+                break;
+
+            default:
+                break;
+        }
+
+        if(useLocationLink && SysDictTable::isTableMapped(tableNum(DimensionDefaultMap), _financialDimensionTable.TableId))
+        {
+            inventLocationDimensionLink = AAX_InventLocationDimensionLink_DimActive::newStandard(_financialDimensionTable);
+        }
+        else
+        {
+            inventLocationDimensionLink = AAX_inventLocationDimensionLink_Null::newStandard();
+        }
+
+        inventLocationDimensionLink.parmStorageDimTable(_storageDimTable);
+        inventLocationDimensionLink.parmInventLocationIdFieldId(inventLocationIdFieldId);
+
+        return inventLocationDimensionLink;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

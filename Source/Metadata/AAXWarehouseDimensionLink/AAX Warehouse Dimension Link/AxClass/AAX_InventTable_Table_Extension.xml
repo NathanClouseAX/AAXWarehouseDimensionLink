@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>AAX_InventTable_Table_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(tableStr(InventTable))]
+public final class AAX_InventTable_Table_Extension
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>inventDimLinkedDefaultDimension</Name>
+				<Source><![CDATA[
+    public DimensionDefault inventDimLinkedDefaultDimension(InventDim  _inventDim)
+    {
+        DimensionDefault DimensionDefault = next inventDimLinkedDefaultDimension(_inventDim);
+
+        if(!InventParameters::find().AAX_isLocationDimensionLinkInactive())
+        {
+            DimensionDefault = DimensionDefaultFacade::serviceMergeDefaultDimensions(DimensionDefault, InventLocation::AAX_changeDimension(this.DefaultDimension, _inventDim.InventLocationId));
+        }
+
+        return(DimensionDefault);
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

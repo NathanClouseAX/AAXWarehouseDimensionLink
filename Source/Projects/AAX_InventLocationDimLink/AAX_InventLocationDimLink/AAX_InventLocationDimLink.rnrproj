@@ -1,0 +1,506 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <Configuration>Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <Model>AAX Warehouse Dimension Link</Model>
+    <DBSyncInBuild>False</DBSyncInBuild>
+    <GenerateFormAdaptors>False</GenerateFormAdaptors>
+    <Company>
+    </Company>
+    <Partition>initial</Partition>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <OutputPath>bin</OutputPath>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <DataEntityExpandParentChildRelations>False</DataEntityExpandParentChildRelations>
+    <DataEntityUseLabelTextAsFieldName>False</DataEntityUseLabelTextAsFieldName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugSymbols>true</DebugSymbols>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ProjectGuid>{3ecb28aa-7e32-47d4-98a3-f68dea25f56d}</ProjectGuid>
+    <Name>AAX_InventLocationDimLink</Name>
+    <RootNamespace>AAX_InventLocationDimLink</RootNamespace>
+    <StartupObject>AAX_ClearDimensionCache</StartupObject>
+    <StartupType>Class</StartupType>
+    <SccProjectName>SAK</SccProjectName>
+    <SccProvider>SAK</SccProvider>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccLocalPath>SAK</SccLocalPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Folder Include="Action Menu Items\" />
+    <Folder Include="Classes\" />
+    <Folder Include="Display Menu Items\" />
+    <Folder Include="Extended Data Types\" />
+    <Folder Include="Form Extensions\" />
+    <Folder Include="Forms\" />
+    <Folder Include="Label Files\" />
+    <Folder Include="Maps\" />
+    <Folder Include="Menu Extensions\" />
+    <Folder Include="Table Extensions" />
+    <Folder Include="Tables" />
+    <Folder Include="Views\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="AAX_InventLocationDimLink.en-US.label.txt">
+      <SubType>Content</SubType>
+      <Name>AAX_InventLocationDimLink.en-US.label.txt</Name>
+      <DependentUpon>AxLabelFile\AAX_InventLocationDimLink_en-US</DependentUpon>
+    </Content>
+    <Content Include="AxClass\AAX_AxInventLocationDimensionable">
+      <SubType>Content</SubType>
+      <Name>AAX_AxInventLocationDimensionable</Name>
+      <Link>Classes\AAX_AxInventLocationDimensionable</Link>
+    </Content>
+    <Content Include="AxClass\AAX_AxPurchLine_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_AxPurchLine_Extension</Name>
+      <Link>Classes\AAX_AxPurchLine_Extension</Link>
+    </Content>
+    <Content Include="AxClass\AAX_AxPurchTable_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_AxPurchTable_Extension</Name>
+      <Link>Classes\AAX_AxPurchTable_Extension</Link>
+    </Content>
+    <Content Include="AxClass\AAX_AxSalesLine_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_AxSalesLine_Extension</Name>
+      <Link>Classes\AAX_AxSalesLine_Extension</Link>
+    </Content>
+    <Content Include="AxClass\AAX_AxSalesTable_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_AxSalesTable_Extension</Name>
+      <Link>Classes\AAX_AxSalesTable_Extension</Link>
+    </Content>
+    <Content Include="AxClass\AAX_ClearDimensionCache">
+      <SubType>Content</SubType>
+      <Name>AAX_ClearDimensionCache</Name>
+      <Link>Classes\AAX_ClearDimensionCache</Link>
+    </Content>
+    <Content Include="AxClass\AAX_CustTable_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_CustTable_Extension</Name>
+      <Link>Classes\AAX_CustTable_Extension</Link>
+    </Content>
+    <Content Include="AxClass\AAX_DimensionCopy_All_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_DimensionCopy_All_Extension</Name>
+      <Link>Classes\AAX_DimensionCopy_All_Extension</Link>
+    </Content>
+    <Content Include="AxClass\AAX_DimensionCopy_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_DimensionCopy_Extension</Name>
+      <Link>Classes\AAX_DimensionCopy_Extension</Link>
+    </Content>
+    <Content Include="AxClass\AAX_DimensionCopy_SiteActive_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_DimensionCopy_SiteActive_Extension</Name>
+      <Link>Classes\AAX_DimensionCopy_SiteActive_Extension</Link>
+    </Content>
+    <Content Include="AxClass\AAX_InventDimCtrl_Frm_EditDimensions_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_InventDimCtrl_Frm_EditDimensions_Extension</Name>
+      <Link>Classes\AAX_InventDimCtrl_Frm_EditDimensions_Extension</Link>
+    </Content>
+    <Content Include="AxClass\AAX_InventDim_EH">
+      <SubType>Content</SubType>
+      <Name>AAX_InventDim_EH</Name>
+      <Link>Classes\AAX_InventDim_EH</Link>
+    </Content>
+    <Content Include="AxClass\AAX_InventDim_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_InventDim_Extension</Name>
+      <Link>Classes\AAX_InventDim_Extension</Link>
+    </Content>
+    <Content Include="AxClass\AAX_InventJournalTrans_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_InventJournalTrans_Extension</Name>
+      <Link>Classes\AAX_InventJournalTrans_Extension</Link>
+    </Content>
+    <Content Include="AxClass\AAX_InventLocationDimensionCheck">
+      <SubType>Content</SubType>
+      <Name>AAX_InventLocationDimensionCheck</Name>
+      <Link>Classes\AAX_InventLocationDimensionCheck</Link>
+    </Content>
+    <Content Include="AxClass\AAX_InventLocationDimensionCheck_Active">
+      <SubType>Content</SubType>
+      <Name>AAX_InventLocationDimensionCheck_Active</Name>
+      <Link>Classes\AAX_InventLocationDimensionCheck_Active</Link>
+    </Content>
+    <Content Include="AxClass\AAX_InventLocationDimensionCheck_Locked">
+      <SubType>Content</SubType>
+      <Name>AAX_InventLocationDimensionCheck_Locked</Name>
+      <Link>Classes\AAX_InventLocationDimensionCheck_Locked</Link>
+    </Content>
+    <Content Include="AxClass\AAX_InventLocationDimensionCheck_Null">
+      <SubType>Content</SubType>
+      <Name>AAX_InventLocationDimensionCheck_Null</Name>
+      <Link>Classes\AAX_InventLocationDimensionCheck_Null</Link>
+    </Content>
+    <Content Include="AxClass\AAX_InventLocationDimensionLink">
+      <SubType>Content</SubType>
+      <Name>AAX_InventLocationDimensionLink</Name>
+      <Link>Classes\AAX_InventLocationDimensionLink</Link>
+    </Content>
+    <Content Include="AxClass\AAX_InventLocationDimensionLink_DimActive">
+      <SubType>Content</SubType>
+      <Name>AAX_InventLocationDimensionLink_DimActive</Name>
+      <Link>Classes\AAX_InventLocationDimensionLink_DimActive</Link>
+    </Content>
+    <Content Include="AxClass\AAX_InventLocationDimensionLink_Null">
+      <SubType>Content</SubType>
+      <Name>AAX_InventLocationDimensionLink_Null</Name>
+      <Link>Classes\AAX_InventLocationDimensionLink_Null</Link>
+    </Content>
+    <Content Include="AxClass\AAX_InventLocationDimensionUpdate">
+      <SubType>Content</SubType>
+      <Name>AAX_InventLocationDimensionUpdate</Name>
+      <Link>Classes\AAX_InventLocationDimensionUpdate</Link>
+    </Content>
+    <Content Include="AxClass\AAX_InventLocationDimension_ActivateLink">
+      <SubType>Content</SubType>
+      <Name>AAX_InventLocationDimension_ActivateLink</Name>
+      <Link>Classes\AAX_InventLocationDimension_ActivateLink</Link>
+    </Content>
+    <Content Include="AxClass\AAX_InventLocationDimension_DeactivateLink">
+      <SubType>Content</SubType>
+      <Name>AAX_InventLocationDimension_DeactivateLink</Name>
+      <Link>Classes\AAX_InventLocationDimension_DeactivateLink</Link>
+    </Content>
+    <Content Include="AxClass\AAX_InventLocationDimension_LockLink">
+      <SubType>Content</SubType>
+      <Name>AAX_InventLocationDimension_LockLink</Name>
+      <Link>Classes\AAX_InventLocationDimension_LockLink</Link>
+    </Content>
+    <Content Include="AxClass\AAX_InventLocationDimension_UnlockLink">
+      <SubType>Content</SubType>
+      <Name>AAX_InventLocationDimension_UnlockLink</Name>
+      <Link>Classes\AAX_InventLocationDimension_UnlockLink</Link>
+    </Content>
+    <Content Include="AxClass\AAX_InventLocationLinkedDimensionEntryController">
+      <SubType>Content</SubType>
+      <Name>AAX_InventLocationLinkedDimensionEntryController</Name>
+      <Link>Classes\AAX_InventLocationLinkedDimensionEntryController</Link>
+    </Content>
+    <Content Include="AxClass\AAX_InventLocationLockedDimensionEntryController">
+      <SubType>Content</SubType>
+      <Name>AAX_InventLocationLockedDimensionEntryController</Name>
+      <Link>Classes\AAX_InventLocationLockedDimensionEntryController</Link>
+    </Content>
+    <Content Include="AxClass\AAX_InventLocation_EH">
+      <SubType>Content</SubType>
+      <Name>AAX_InventLocation_EH</Name>
+      <Link>Classes\AAX_InventLocation_EH</Link>
+    </Content>
+    <Content Include="AxClass\AAX_InventLocation_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_InventLocation_Extension</Name>
+      <Link>Classes\AAX_InventLocation_Extension</Link>
+    </Content>
+    <Content Include="AxClass\AAX_InventLocation_Form_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_InventLocation_Form_Extension</Name>
+      <Link>Classes\AAX_InventLocation_Form_Extension</Link>
+    </Content>
+    <Content Include="AxClass\AAX_InventMov_TransferFrom_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_InventMov_TransferFrom_Extension</Name>
+      <Link>Classes\AAX_InventMov_TransferFrom_Extension</Link>
+    </Content>
+    <Content Include="AxClass\AAX_InventMov_TransferTo_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_InventMov_TransferTo_Extension</Name>
+      <Link>Classes\AAX_InventMov_TransferTo_Extension</Link>
+    </Content>
+    <Content Include="AxClass\AAX_InventMov_TransferTransitFrom_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_InventMov_TransferTransitFrom_Extension</Name>
+      <Link>Classes\AAX_InventMov_TransferTransitFrom_Extension</Link>
+    </Content>
+    <Content Include="AxClass\AAX_InventMov_TransferTransitTo_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_InventMov_TransferTransitTo_Extension</Name>
+      <Link>Classes\AAX_InventMov_TransferTransitTo_Extension</Link>
+    </Content>
+    <Content Include="AxClass\AAX_InventMov_Transfer_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_InventMov_Transfer_Extension</Name>
+      <Link>Classes\AAX_InventMov_Transfer_Extension</Link>
+    </Content>
+    <Content Include="AxClass\AAX_InventMov_Vir_Counting_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_InventMov_Vir_Counting_Extension</Name>
+      <Link>Classes\AAX_InventMov_Vir_Counting_Extension</Link>
+    </Content>
+    <Content Include="AxClass\AAX_InventMov_Vir_Transfer_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_InventMov_Vir_Transfer_Extension</Name>
+      <Link>Classes\AAX_InventMov_Vir_Transfer_Extension</Link>
+    </Content>
+    <Content Include="AxClass\AAX_InventParameters_EH">
+      <SubType>Content</SubType>
+      <Name>AAX_InventParameters_EH</Name>
+      <Link>Classes\AAX_InventParameters_EH</Link>
+    </Content>
+    <Content Include="AxClass\AAX_InventParameters_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_InventParameters_Extension</Name>
+      <Link>Classes\AAX_InventParameters_Extension</Link>
+    </Content>
+    <Content Include="AxClass\AAX_InventSiteDimensionLinkValidationDP">
+      <SubType>Content</SubType>
+      <Name>AAX_InventSiteDimensionLinkValidationDP</Name>
+      <Link>Classes\AAX_InventSiteDimensionLinkValidationDP</Link>
+    </Content>
+    <Content Include="AxClass\AAX_InventSiteDimension_ActivateLink_EH">
+      <SubType>Content</SubType>
+      <Name>AAX_InventSiteDimension_ActivateLink_EH</Name>
+      <Link>Classes\AAX_InventSiteDimension_ActivateLink_EH</Link>
+    </Content>
+    <Content Include="AxClass\AAX_InventSiteDimLinkValidContract">
+      <SubType>Content</SubType>
+      <Name>AAX_InventSiteDimLinkValidContract</Name>
+      <Link>Classes\AAX_InventSiteDimLinkValidContract</Link>
+    </Content>
+    <Content Include="AxClass\AAX_InventSiteLinkedDimensionEntryController_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_InventSiteLinkedDimensionEntryController_Extension</Name>
+      <Link>Classes\AAX_InventSiteLinkedDimensionEntryController_Extension</Link>
+    </Content>
+    <Content Include="AxClass\AAX_InventSite_EH">
+      <SubType>Content</SubType>
+      <Name>AAX_InventSite_EH</Name>
+      <Link>Classes\AAX_InventSite_EH</Link>
+    </Content>
+    <Content Include="AxClass\AAX_InventTable_Table_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_InventTable_Table_Extension</Name>
+      <Link>Classes\AAX_InventTable_Table_Extension</Link>
+    </Content>
+    <Content Include="AxClass\AAX_InventTransferLine_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_InventTransferLine_Extension</Name>
+      <Link>Classes\AAX_InventTransferLine_Extension</Link>
+    </Content>
+    <Content Include="AxClass\AAX_ProdJournalRoute_EH">
+      <SubType>Content</SubType>
+      <Name>AAX_ProdJournalRoute_EH</Name>
+      <Link>Classes\AAX_ProdJournalRoute_EH</Link>
+    </Content>
+    <Content Include="AxClass\AAX_PurchLineType_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_PurchLineType_Extension</Name>
+      <Link>Classes\AAX_PurchLineType_Extension</Link>
+    </Content>
+    <Content Include="AxClass\AAX_PurchRFQCaseTableType_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_PurchRFQCaseTableType_Extension</Name>
+      <Link>Classes\AAX_PurchRFQCaseTableType_Extension</Link>
+    </Content>
+    <Content Include="AxClass\AAX_PurchRFQCaseTable_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_PurchRFQCaseTable_Extension</Name>
+      <Link>Classes\AAX_PurchRFQCaseTable_Extension</Link>
+    </Content>
+    <Content Include="AxClass\AAX_PurchRFQTable_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_PurchRFQTable_Extension</Name>
+      <Link>Classes\AAX_PurchRFQTable_Extension</Link>
+    </Content>
+    <Content Include="AxClass\AAX_PurchTableType_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_PurchTableType_Extension</Name>
+      <Link>Classes\AAX_PurchTableType_Extension</Link>
+    </Content>
+    <Content Include="AxClass\AAX_PurchTable_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_PurchTable_Extension</Name>
+      <Link>Classes\AAX_PurchTable_Extension</Link>
+    </Content>
+    <Content Include="AxClass\AAX_SalesLineType_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_SalesLineType_Extension</Name>
+      <Link>Classes\AAX_SalesLineType_Extension</Link>
+    </Content>
+    <Content Include="AxClass\AAX_SalesTableType_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_SalesTableType_Extension</Name>
+      <Link>Classes\AAX_SalesTableType_Extension</Link>
+    </Content>
+    <Content Include="AxClass\AAX_SalesTable_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_SalesTable_Extension</Name>
+      <Link>Classes\AAX_SalesTable_Extension</Link>
+    </Content>
+    <Content Include="AxClass\AAX_UpdateWarehouseDimensions">
+      <SubType>Content</SubType>
+      <Name>AAX_UpdateWarehouseDimensions</Name>
+      <Link>Classes\AAX_UpdateWarehouseDimensions</Link>
+    </Content>
+    <Content Include="AxClass\AAX_VendDocumentTableType_Invoice_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_VendDocumentTableType_Invoice_Extension</Name>
+      <Link>Classes\AAX_VendDocumentTableType_Invoice_Extension</Link>
+    </Content>
+    <Content Include="AxClass\AAX_VendInvoiceInfoTable_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_VendInvoiceInfoTable_Extension</Name>
+      <Link>Classes\AAX_VendInvoiceInfoTable_Extension</Link>
+    </Content>
+    <Content Include="AxClass\AAX_VendTable_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_VendTable_Extension</Name>
+      <Link>Classes\AAX_VendTable_Extension</Link>
+    </Content>
+    <Content Include="AxClass\AAX_whsInventMov_Container_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_whsInventMov_Container_Extension</Name>
+      <Link>Classes\AAX_whsInventMov_Container_Extension</Link>
+    </Content>
+    <Content Include="AxClass\AAX_WhsInventMov_Quarantine_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_WhsInventMov_Quarantine_Extension</Name>
+      <Link>Classes\AAX_WhsInventMov_Quarantine_Extension</Link>
+    </Content>
+    <Content Include="AxClass\AAX_WhsInventMov_Work_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_WhsInventMov_Work_Extension</Name>
+      <Link>Classes\AAX_WhsInventMov_Work_Extension</Link>
+    </Content>
+    <Content Include="AxEdt\AAX_InventLocationLinkedDimensionValueSet">
+      <SubType>Content</SubType>
+      <Name>AAX_InventLocationLinkedDimensionValueSet</Name>
+      <Link>Extended Data Types\AAX_InventLocationLinkedDimensionValueSet</Link>
+    </Content>
+    <Content Include="AxEdt\AAX_InventLocationLockedDimensionValueSet">
+      <SubType>Content</SubType>
+      <Name>AAX_InventLocationLockedDimensionValueSet</Name>
+      <Link>Extended Data Types\AAX_InventLocationLockedDimensionValueSet</Link>
+    </Content>
+    <Content Include="AxFormExtension\InventLocation.Extension_AAX">
+      <SubType>Content</SubType>
+      <Name>InventLocation.Extension_AAX</Name>
+      <Link>Form Extensions\InventLocation.Extension_AAX</Link>
+    </Content>
+    <Content Include="AxForm\AAX_InventLocationDimensionLink">
+      <SubType>Content</SubType>
+      <Name>AAX_InventLocationDimensionLink</Name>
+      <Link>Forms\AAX_InventLocationDimensionLink</Link>
+    </Content>
+    <Content Include="AxLabelFile\AAX_InventLocationDimLink_en-US">
+      <SubType>Content</SubType>
+      <Name>AAX_InventLocationDimLink_en-US</Name>
+      <Link>Label Files\AAX_InventLocationDimLink_en-US</Link>
+    </Content>
+    <Content Include="AxMap\AAX_InventStorageDimMap">
+      <SubType>Content</SubType>
+      <Name>AAX_InventStorageDimMap</Name>
+      <Link>Maps\AAX_InventStorageDimMap</Link>
+    </Content>
+    <Content Include="AxMenuExtension\InventoryManagement.Extension_AAX">
+      <SubType>Content</SubType>
+      <Name>InventoryManagement.Extension_AAX</Name>
+      <Link>Menu Extensions\InventoryManagement.Extension_AAX</Link>
+    </Content>
+    <Content Include="AxMenuItemAction\AAX_InventLocationDimensionUpdate">
+      <SubType>Content</SubType>
+      <Name>AAX_InventLocationDimensionUpdate</Name>
+      <Link>Action Menu Items\AAX_InventLocationDimensionUpdate</Link>
+    </Content>
+    <Content Include="AxMenuItemAction\AAX_InventLocationDimension_ActivateLink">
+      <SubType>Content</SubType>
+      <Name>AAX_InventLocationDimension_ActivateLink</Name>
+      <Link>Action Menu Items\AAX_InventLocationDimension_ActivateLink</Link>
+    </Content>
+    <Content Include="AxMenuItemAction\AAX_InventLocationDimension_DeactivateLink">
+      <SubType>Content</SubType>
+      <Name>AAX_InventLocationDimension_DeactivateLink</Name>
+      <Link>Action Menu Items\AAX_InventLocationDimension_DeactivateLink</Link>
+    </Content>
+    <Content Include="AxMenuItemAction\AAX_InventLocationDimension_LockLink">
+      <SubType>Content</SubType>
+      <Name>AAX_InventLocationDimension_LockLink</Name>
+      <Link>Action Menu Items\AAX_InventLocationDimension_LockLink</Link>
+    </Content>
+    <Content Include="AxMenuItemAction\AAX_InventLocationDimension_UnlockLink">
+      <SubType>Content</SubType>
+      <Name>AAX_InventLocationDimension_UnlockLink</Name>
+      <Link>Action Menu Items\AAX_InventLocationDimension_UnlockLink</Link>
+    </Content>
+    <Content Include="AxMenuItemAction\AAX_UpdateWarehouseDimensions">
+      <SubType>Content</SubType>
+      <Name>AAX_UpdateWarehouseDimensions</Name>
+      <Link>Action Menu Items\AAX_UpdateWarehouseDimensions</Link>
+    </Content>
+    <Content Include="AxMenuItemDisplay\AAX_InventLocationDimensionLink">
+      <SubType>Content</SubType>
+      <Name>AAX_InventLocationDimensionLink</Name>
+      <Link>Display Menu Items\AAX_InventLocationDimensionLink</Link>
+    </Content>
+    <Content Include="AxTableExtension\CustTable.Extension_AAX">
+      <SubType>Content</SubType>
+      <Name>CustTable.Extension_AAX</Name>
+      <Link>Table Extensions\CustTable.Extension_AAX</Link>
+    </Content>
+    <Content Include="AxTableExtension\InventDim.Extension_AAX">
+      <SubType>Content</SubType>
+      <Name>InventDim.Extension_AAX</Name>
+      <Link>Table Extensions\InventDim.Extension_AAX</Link>
+    </Content>
+    <Content Include="AxTableExtension\InventLocation.Extension_AAX">
+      <SubType>Content</SubType>
+      <Name>InventLocation.Extension_AAX</Name>
+      <Link>Table Extensions\InventLocation.Extension_AAX</Link>
+    </Content>
+    <Content Include="AxTableExtension\InventParameters.Extension_AAX">
+      <SubType>Content</SubType>
+      <Name>InventParameters.Extension_AAX</Name>
+      <Link>Table Extensions\InventParameters.Extension_AAX</Link>
+    </Content>
+    <Content Include="AxTableExtension\PurchRFQCaseTable.Extension_AAX">
+      <SubType>Content</SubType>
+      <Name>PurchRFQCaseTable.Extension_AAX</Name>
+      <Link>Table Extensions\PurchRFQCaseTable.Extension_AAX</Link>
+    </Content>
+    <Content Include="AxTableExtension\PurchRFQTable.Extension_AAX">
+      <SubType>Content</SubType>
+      <Name>PurchRFQTable.Extension_AAX</Name>
+      <Link>Table Extensions\PurchRFQTable.Extension_AAX</Link>
+    </Content>
+    <Content Include="AxTableExtension\PurchTable.Extension_AAX">
+      <SubType>Content</SubType>
+      <Name>PurchTable.Extension_AAX</Name>
+      <Link>Table Extensions\PurchTable.Extension_AAX</Link>
+    </Content>
+    <Content Include="AxTableExtension\SalesTable.Extension_AAX">
+      <SubType>Content</SubType>
+      <Name>SalesTable.Extension_AAX</Name>
+      <Link>Table Extensions\SalesTable.Extension_AAX</Link>
+    </Content>
+    <Content Include="AxTableExtension\VendInvoiceInfoTable.Extension_AAX">
+      <SubType>Content</SubType>
+      <Name>VendInvoiceInfoTable.Extension_AAX</Name>
+      <Link>Table Extensions\VendInvoiceInfoTable.Extension_AAX</Link>
+    </Content>
+    <Content Include="AxTableExtension\VendTable.Extension_AAX">
+      <SubType>Content</SubType>
+      <Name>VendTable.Extension_AAX</Name>
+      <Link>Table Extensions\VendTable.Extension_AAX</Link>
+    </Content>
+    <Content Include="AxView\DimAttributeInventLocation">
+      <SubType>Content</SubType>
+      <Name>DimAttributeInventLocation</Name>
+      <Link>Views\DimAttributeInventLocation</Link>
+    </Content>
+    <Content Include="AxView\DimAttributeInventSite">
+      <SubType>Content</SubType>
+      <Name>DimAttributeInventSite</Name>
+      <Link>Views\DimAttributeInventSite</Link>
+    </Content>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.Common.targets" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Dynamics\AX\Microsoft.Dynamics.Framework.Tools.BuildTasks.targets" />
+</Project>

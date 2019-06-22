@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>AAX_CustTable_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(tableStr(CustTable))]
+public final class AAX_CustTable_Extension
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>validateField</Name>
+				<Source><![CDATA[
+    boolean validateField(FieldId p1)
+    {
+        boolean                     ret = true;
+
+        if (ret)
+        {
+            switch (p1)
+            {
+                case fieldNum(CustTable, InventLocation) :
+                    ret = this.AAX_InventStorageDimMap::validateField(fieldNum(AAX_InventStorageDimMap, InventLocationId));
+                    break;                
+            }
+
+        }
+
+        return next validateField(p1) && ret;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>modifiedField</Name>
+				<Source><![CDATA[
+    public void modifiedField(FieldId _fieldId)
+    {
+        switch (_fieldId)
+        {
+            case fieldNum(CustTable, InventSiteId) :
+                this.AAX_InventStorageDimMap::modifiedField(fieldNum(AAX_InventStorageDimMap, InventSiteId));
+                break;
+
+            case fieldNum(CustTable, InventLocation) :
+                this.AAX_InventStorageDimMap::modifiedField(fieldNum(AAX_InventStorageDimMap, InventLocationId));
+                break;
+
+        }
+
+        next modifiedField(_fieldId);
+
+
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

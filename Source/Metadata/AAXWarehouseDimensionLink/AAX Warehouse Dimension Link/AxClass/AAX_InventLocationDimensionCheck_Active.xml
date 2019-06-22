@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>AAX_InventLocationDimensionCheck_Active</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+class AAX_InventLocationDimensionCheck_Active extends AAX_InventLocationDimensionCheck
+{
+    InventLocation          InventLocation;
+    
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>checkDimensions</Name>
+				<Source><![CDATA[
+    public boolean checkDimensions(InventDim _inventDim, DimensionDefault _dimension)
+    {
+        return true;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>new</Name>
+				<Source><![CDATA[
+    protected void new()
+    {
+        super();
+
+        InventParameters    = InventParameters::find();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>construct</Name>
+				<Source><![CDATA[
+    static public AAX_InventLocationDimensionCheck_Active construct()
+    {
+        return new AAX_InventLocationDimensionCheck_Active();
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>
