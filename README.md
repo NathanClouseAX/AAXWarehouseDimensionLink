@@ -11,3 +11,4 @@ The source code, a model and a deployable package of the latest versions are ava
 Nothing - Its 100% open source.
 #### What if I find a bug?
 please log an issue here: https://github.com/NathanClouseAX/AAXWarehouseDimensionLink/issues
+Also check out the planned features here: https://github.com/NathanClouseAX/AAXWarehouseDimensionLink/labels/enhancement
