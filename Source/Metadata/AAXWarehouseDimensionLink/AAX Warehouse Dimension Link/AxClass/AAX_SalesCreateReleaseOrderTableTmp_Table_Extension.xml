@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>AAX_SalesCreateReleaseOrderTableTmp_Table_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(tableStr(SalesCreateReleaseOrderTableTmp))]
+public final class AAX_SalesCreateReleaseOrderTableTmp_Table_Extension
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>modifiedField</Name>
+				<Source><![CDATA[
+    public void modifiedField(FieldId _fieldId)
+    {
+        next modifiedField(_fieldId);
+
+        switch (_fieldId)
+        {
+            case fieldNum(SalesCreateReleaseOrderTableTmp, InventSiteId):
+                this.AAX_InventStorageDimMap::modifiedField(fieldNum(AAX_InventStorageDimMap,InventSiteId));
+                break;
+
+            case fieldNum(SalesCreateReleaseOrderTableTmp, InventLocationId):
+                this.AAX_InventStorageDimMap::modifiedField(fieldNum(AAX_InventStorageDimMap,InventLocationId));
+                break;
+
+            default:
+                break;
+        }
+        //required for delv date recalc if location changed.
+        this.modifiedFieldDDC(_fieldId);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>validateField</Name>
+				<Source><![CDATA[
+    public boolean validateField(FieldId _fieldIdToCheck)
+    {
+        boolean ret;
+
+        ret = next validateField(_fieldIdToCheck);
+
+        switch (_fieldIdToCheck)
+        {
+            case fieldNum(SalesCreateReleaseOrderTableTmp, InventLocationId):
+                ret = ret & this.AAX_InventStorageDimMap::validateField(fieldNum(AAX_InventStorageDimMap, InventLocationId));
+                break;
+        }
+
+        return ret;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

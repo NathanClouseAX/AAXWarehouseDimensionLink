@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>AAX_SalesBasket_Table_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(tableStr(SalesBasket))]
+public final class AAX_SalesBasket_Table_Extension
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>initFromCustTable</Name>
+				<Source><![CDATA[
+    void  initFromCustTable()
+    {
+        next initFromCustTable();
+
+        this.AAX_InventStorageDimMap::initFromInventLocation(InventLocation::find(this.InventLocationId));
+
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>modifiedField</Name>
+				<Source><![CDATA[
+    public void modifiedField(fieldId _fieldId)
+    {
+        next modifiedField(_fieldId);
+
+        switch (_fieldId)
+        {
+            case fieldnum(SalesBasket, InventSiteId) :
+                this.AAX_InventStorageDimMap::modifiedField(fieldnum(AAX_InventStorageDimMap, InventSiteId));
+                break;
+            case fieldnum(SalesBasket, InventLocationId) :
+                this.AAX_InventStorageDimMap::modifiedField(fieldnum(AAX_InventStorageDimMap, InventLocationId));
+                break;
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>modifiedInventSiteFromParent</Name>
+				<Source><![CDATA[
+    public void modifiedInventSiteFromParent(Common _parent)
+    {
+        next modifiedInventSiteFromParent(_parent);
+
+        this.AAX_InventStorageDimMap::modifiedInventSiteFromParent(_parent);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>validateField</Name>
+				<Source><![CDATA[
+    public boolean validateField(fieldId _fieldIdToCheck)
+    {
+        boolean ret;
+
+        ret = next validateFIeld(_fieldIdToCheck);
+
+        if (ret)
+        {
+            switch (_fieldIdToCheck)
+            {
+                case fieldnum(SalesBasket,InventLocationId) :
+                    ret = this.AAX_InventStorageDimMap::validateField(fieldnum(AAX_InventStorageDimMap,InventLocationId));
+                    break;
+            }
+        }
+
+        return ret;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>
