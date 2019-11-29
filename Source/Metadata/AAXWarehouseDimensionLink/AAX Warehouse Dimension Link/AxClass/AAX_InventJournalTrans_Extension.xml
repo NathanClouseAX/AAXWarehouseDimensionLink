@@ -20,7 +20,7 @@ final class AAX_InventJournalTrans_Extension
 
         if (_toInventDim.InventLocationId)
         {
-            toDimension = InventLocation::AAX_changeDimension(toDimension, _toInventDim.InventLocationId);
+            toDimension = InventLocation::AAX_changeDimension(toDimension, _toInventDim.InventLocationId, false);
         }
 
         return toDimension;

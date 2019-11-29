@@ -18,7 +18,7 @@ public final class AAX_InventTable_Table_Extension
 
         if(!InventParameters::find().AAX_isLocationDimensionLinkInactive())
         {
-            DimensionDefault = DimensionDefaultFacade::serviceMergeDefaultDimensions(DimensionDefault, InventLocation::AAX_changeDimension(this.DefaultDimension, _inventDim.InventLocationId));
+            DimensionDefault = DimensionDefaultFacade::serviceMergeDefaultDimensions(DimensionDefault, InventLocation::AAX_changeDimension(this.DefaultDimension, _inventDim.InventLocationId, false));
         }
 
         return(DimensionDefault);

@@ -8,17 +8,46 @@ class AAX_InventLocationDimensionLink_DimActive extends AAX_inventLocationDimens
     InventParameters    InventParameters;
     DimensionDefaultMap     dimensionDefaultMap;
 
+    //For Retail
+    private boolean isRetail = false;
+    AAX_RetailDimensionDefaultMap AAX_RetailDimensionDefaultMap;
+
 }
 ]]></Declaration>
 		<Methods>
+			<Method>
+				<Name>parmIsRetail</Name>
+				<Source><![CDATA[
+    public boolean parmIsRetail(boolean _isRetail = isRetail)
+    {
+        isRetail = _isRetail;
+        return(isRetail);
+    }
+
+]]></Source>
+			</Method>
 			<Method>
 				<Name>axParmDefaultDimensionSet</Name>
 				<Source><![CDATA[
     public void axParmDefaultDimensionSet(AxInventSiteDimensionable _AAX_AxInventLocationDimensionable, DimensionDefault _dimension)
     {
-        DimensionDefault originalDimension = dimensionDefaultMap.DefaultDimension;
+        DimensionDefault originalDimension;
 
-        DimensionDefault resultDimension = LedgerDimensionDefaultFacade::serviceReplaceAttributeValue(_dimension, originalDimension, InventParameters.AAX_LocationDimensionAttribute);
+        DimensionDefault resultDimension;
+
+        //todo
+        switch(isRetail)
+        {
+            case true:
+                originalDimension = AAX_RetailDimensionDefaultMap.DefaultDimension;
+                break;
+
+            default:
+                originalDimension = dimensionDefaultMap.DefaultDimension;
+                break;
+        }
+
+        resultDimension = LedgerDimensionDefaultFacade::serviceReplaceAttributeValue(_dimension, originalDimension, InventParameters.AAX_LocationDimensionAttribute);
 
         _AAX_AxInventLocationDimensionable.setDefaultDimensionValue(resultDimension);
     }
@@ -33,6 +62,8 @@ class AAX_InventLocationDimensionLink_DimActive extends AAX_inventLocationDimens
         DimensionDefault    resultDimension;
         DimensionDefault    siteDimension;
 
+        DimensionDefault originalDimension;
+
         boolean isSiteDimensionEmpty(DimensionDefault _dimension)
         {
             return (DimensionAttributeValueSetStorage::find(_dimension).getValueByDimensionAttribute(InventParameters.AAX_LocationDimensionAttribute) == 0);
@@ -42,7 +73,15 @@ class AAX_InventLocationDimensionLink_DimActive extends AAX_inventLocationDimens
 
         if (_AAX_AxInventLocationDimensionable.isStorageDimFieldSet(inventLocationIdFieldId))
         {
-            DimensionDefault originalDimension = dimensionDefaultMap.DefaultDimension;
+            switch(isRetail)
+            {
+                case true:
+                    originalDimension = AAX_RetailDimensionDefaultMap.DefaultDimension;
+                    break;
+                default:
+                    originalDimension = dimensionDefaultMap.DefaultDimension;
+                    break;
+            }
 
             if (isSiteDimensionEmpty(originalDimension)
             || inventParameters.MultiSiteDimensionLink == InventMultiSiteDimensionLink::Locked
@@ -64,8 +103,22 @@ class AAX_InventLocationDimensionLink_DimActive extends AAX_inventLocationDimens
 				<Source><![CDATA[
     public void linkDimension()
     {
-        DimensionDefault    dimension = dimensionDefaultMap.DefaultDimension;
-        dimensionDefaultMap.DefaultDimension = InventLocation::AAX_changeDimension(dimension, storageDimTable.(inventLocationIdFieldId));
+        DimensionDefault    dimension;
+        
+        switch(isRetail)
+        {
+            case true:
+                dimension = AAX_RetailDimensionDefaultMap.DefaultDimension;
+                AAX_RetailDimensionDefaultMap.DefaultDimension = InventLocation::AAX_changeDimension(dimension, storageDimTable.(inventLocationIdFieldId), isRetail);
+                break;
+
+            default:
+                dimension = dimensionDefaultMap.DefaultDimension;
+                dimensionDefaultMap.DefaultDimension = InventLocation::AAX_changeDimension(dimension, storageDimTable.(inventLocationIdFieldId), isRetail);
+                break;
+        }
+
+        
     }
 
 ]]></Source>
@@ -77,8 +130,19 @@ class AAX_InventLocationDimensionLink_DimActive extends AAX_inventLocationDimens
     {
         super();
 
-        dimensionDefaultMap  = _common;
+        switch(_common.TableId)
+        {
+            case tableNum(RetailStoreTable):
+                AAX_RetailDimensionDefaultMap  = _common;
+                this.parmIsRetail(true);
+                break;
 
+            default:
+                dimensionDefaultMap  = _common;
+                this.parmIsRetail(false);
+                break;
+
+        }
         inventParameters        = InventParameters::find();
     }
 

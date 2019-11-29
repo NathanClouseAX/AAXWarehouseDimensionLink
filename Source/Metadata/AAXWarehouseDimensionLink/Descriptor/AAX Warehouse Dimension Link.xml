@@ -38,7 +38,6 @@
 		<d2p1:string>InventoryDimensionConversion</d2p1:string>
 		<d2p1:string>Ledger</d2p1:string>
 		<d2p1:string>Measurement</d2p1:string>
-		<d2p1:string>PaymentPredictor</d2p1:string>
 		<d2p1:string>Personnel</d2p1:string>
 		<d2p1:string>PersonnelCore</d2p1:string>
 		<d2p1:string>PersonnelManagement</d2p1:string>

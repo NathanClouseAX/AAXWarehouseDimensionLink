@@ -14,7 +14,7 @@ final class AAX_InventLocation_Extension
 				<Source><![CDATA[
     /// <summary>
     /// Indicates whether the dimension that is linked to site is the same as the dimension that is
-    /// specified on the site.
+    /// specified on the warehouse.
     /// </summary>
     /// <param name="_dimension">
     /// The dimension to check.
@@ -40,7 +40,7 @@ final class AAX_InventLocation_Extension
 				<Name>AAX_dimensionAttributeValue</Name>
 				<Source><![CDATA[
     /// <summary>
-    ///    Gets the dimension value for the site linked attribute.
+    ///    Gets the dimension value for the warehouse linked attribute.
     /// </summary>
     /// <returns>
     ///    The <c>RecId</c> value of the <c>DimensionAttributeValue</c> record that corresponds to the
@@ -61,7 +61,7 @@ final class AAX_InventLocation_Extension
 				<Name>AAX_useLocationLink</Name>
 				<Source><![CDATA[
     /// <summary>
-    /// Determines whether to use the site link for the provided buffer.
+    /// Determines whether to use the warehouse link for the provided buffer.
     /// </summary>
     /// <param name="_common">
     /// A buffer to check.
@@ -83,7 +83,7 @@ final class AAX_InventLocation_Extension
 
         #ISOCountryRegionCodes
 
-        // If the link is not inactive, site dimension link is used
+        // If the link is not inactive, warehouse dimension link is used
         if (!InventParameters::find().AAX_isLocationDimensionLinkInactive())
         {
             useLocationLink = true;
@@ -118,6 +118,9 @@ final class AAX_InventLocation_Extension
                 case tableNum(SalesTable):
                 case tableNum(TmpBOM):
                 case tableNum(VendTable):
+                //Retail specific
+                case tableNum(RetailStoreTable):
+                case tableNum(RetailChannelTable):
                     break;
                 // some transactions use LocationLink depending on type
                 case tableNum(SMAServiceOrderLine):
@@ -191,17 +194,30 @@ final class AAX_InventLocation_Extension
     /// If the site link is inactive, this method returns the dimension that was passed without any changes
     /// to it.
     /// </remarks>
-    public static DimensionDefault AAX_changeDimension(DimensionDefault _dimension, InventLocationId _InventLocationId)
+    public static DimensionDefault AAX_changeDimension(DimensionDefault _dimension, 
+                                                       InventLocationId _InventLocationId,
+                                                       boolean isRetail)
     {
         DimensionDefault    LocationDimension;
         InventParameters    InventParameters = InventParameters::find();
+
+        //TODO: create find
+        InventLocation InventLocation;
 
         if (InventParameters.AAX_isLocationDimensionLinkInactive())
         {
             return _dimension;
         }
 
-        LocationDimension = InventLocation::find(_InventLocationId).AAX_DefaultDimension;
+        if(isRetail)
+        {
+            select crosscompany * from InventLocation where InventLocation.InventLocationId == _InventLocationId;
+            LocationDimension = InventLocation.AAX_DefaultDimension;
+        }
+        else
+        {
+            LocationDimension = InventLocation::find(_InventLocationId).AAX_DefaultDimension;
+        }
 
         return LedgerDimensionDefaultFacade::serviceReplaceAttributeValue(_dimension, LocationDimension, InventParameters.AAX_LocationDimensionAttribute);
     }

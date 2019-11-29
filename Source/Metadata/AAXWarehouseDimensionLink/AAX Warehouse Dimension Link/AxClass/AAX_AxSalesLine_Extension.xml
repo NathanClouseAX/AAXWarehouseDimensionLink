@@ -38,7 +38,7 @@ public final class AAX_AxSalesLine_Extension //implements AAX_AxInventLocationDi
 			<Method>
 				<Name>AAX_InventLocationDimensionLink</Name>
 				<Source><![CDATA[
-    protected AAX_InventLocationDimensionLink AAX_InventLocationDimensionLink()
+    public AAX_InventLocationDimensionLink AAX_InventLocationDimensionLink()
     {
         return AAX_InventLocationDimensionLink::newDimensionTables(this.salesLine(), this.axInventDim().inventDim());
     }

@@ -24,7 +24,7 @@ public final class AAX_AxSalesQuotationLine_Extension
 			<Method>
 				<Name>AAX_InventLocationDimensionLink</Name>
 				<Source><![CDATA[
-    protected AAX_InventLocationDimensionLink AAX_InventLocationDimensionLink()
+    public AAX_InventLocationDimensionLink AAX_InventLocationDimensionLink()
     {
         return AAX_InventLocationDimensionLink::newDimensionTables(this.salesQuotationLine(), this.axInventDim().inventDim());
     }

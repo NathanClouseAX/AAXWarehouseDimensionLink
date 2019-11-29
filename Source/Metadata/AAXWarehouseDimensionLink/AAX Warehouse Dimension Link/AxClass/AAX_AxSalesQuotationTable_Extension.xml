@@ -16,7 +16,7 @@ public final class AAX_AxSalesQuotationTable_Extension
     {
         DimensionDefault                        toDimension = next parmDefaultDimension(_defaultDimension);
 
-        ToDimension = InventLocation::AAX_changeDimension(ToDimension, this.parmInventLocationId());
+        ToDimension = InventLocation::AAX_changeDimension(ToDimension, this.parmInventLocationId(),false);
 
         return(toDimension);
     }
@@ -38,7 +38,7 @@ public final class AAX_AxSalesQuotationTable_Extension
 			<Method>
 				<Name>AAX_InventLocationDimensionLink</Name>
 				<Source><![CDATA[
-    protected AAX_InventLocationDimensionLink AAX_InventLocationDimensionLink()
+    public AAX_InventLocationDimensionLink AAX_InventLocationDimensionLink()
     {
         return AAX_InventLocationDimensionLink::newDimensionTables(this.salesQuotationTable(), this.salesQuotationTable());
     }

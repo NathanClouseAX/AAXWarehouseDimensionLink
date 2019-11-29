@@ -21,9 +21,9 @@ public final class AAX_InventTransferLine_Extension
 
         next initFromInventTable(_inventTable, _inventDimId);
 
-        this.DimensionDefaultShipFrom = DimensionDefaultFacade::serviceMergeDefaultDimensions(this.DimensionDefaultShipFrom, InventLocation::AAX_changeDimension(_InventTable.DefaultDimension, InventDim.InventLocationId));
+        this.DimensionDefaultShipFrom = DimensionDefaultFacade::serviceMergeDefaultDimensions(this.DimensionDefaultShipFrom, InventLocation::AAX_changeDimension(_InventTable.DefaultDimension, InventDim.InventLocationId, false));
 
-        this.DimensionDefaultShipTo   = DimensionDefaultFacade::serviceMergeDefaultDimensions(this.DimensionDefaultShipTo,   InventLocation::AAX_changeDimension(_InventTable.DefaultDimension, InventDimTo.InventLocationId));
+        this.DimensionDefaultShipTo   = DimensionDefaultFacade::serviceMergeDefaultDimensions(this.DimensionDefaultShipTo,   InventLocation::AAX_changeDimension(_InventTable.DefaultDimension, InventDimTo.InventLocationId, false));
    
     }
 

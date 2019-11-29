@@ -16,7 +16,7 @@ internal final class AAX_AxPurchTable_Extension //implements AAX_AxInventLocatio
     {
         DimensionDefault                        toDimension = next parmDefaultDimension(_defaultDimension);
 
-        ToDimension = InventLocation::AAX_changeDimension(ToDimension, this.parmInventLocationId());
+        ToDimension = InventLocation::AAX_changeDimension(ToDimension, this.parmInventLocationId(),false);
 
         return(toDimension);
     }
@@ -38,7 +38,7 @@ internal final class AAX_AxPurchTable_Extension //implements AAX_AxInventLocatio
 			<Method>
 				<Name>AAX_InventLocationDimensionLink</Name>
 				<Source><![CDATA[
-    protected AAX_InventLocationDimensionLink AAX_InventLocationDimensionLink()
+    public AAX_InventLocationDimensionLink AAX_InventLocationDimensionLink()
     {
         return AAX_InventLocationDimensionLink::newDimensionTables(this.PurchTable(), this.PurchTable());
     }

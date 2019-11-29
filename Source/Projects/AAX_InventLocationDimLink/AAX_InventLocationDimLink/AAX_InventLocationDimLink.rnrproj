@@ -2,16 +2,12 @@
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <Configuration>Debug</Configuration>
-    <SchemaVersion>2.0</SchemaVersion>
-    <Model>AAX Warehouse Dimension Link</Model>
     <DBSyncInBuild>False</DBSyncInBuild>
     <GenerateFormAdaptors>False</GenerateFormAdaptors>
     <Company>
     </Company>
     <Partition>initial</Partition>
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <OutputPath>bin</OutputPath>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <DataEntityExpandParentChildRelations>False</DataEntityExpandParentChildRelations>
     <DataEntityUseLabelTextAsFieldName>False</DataEntityUseLabelTextAsFieldName>
   </PropertyGroup>
@@ -29,6 +25,13 @@
     <SccProvider>SAK</SccProvider>
     <SccAuxPath>SAK</SccAuxPath>
     <SccLocalPath>SAK</SccLocalPath>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <BuildTasksDirectory Condition=" '$(BuildTasksDirectory)' == '' ">$(MSBuildProgramFiles32)\MSBuild\Microsoft\Dynamics\AX</BuildTasksDirectory>
+    <SchemaVersion>2.0</SchemaVersion>
+    <Model>AAX Warehouse Dimension Link</Model>
+    <OutputPath>bin</OutputPath>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="Action Menu Items\" />
@@ -70,6 +73,16 @@
       <Name>AAX_AxSalesLine_Extension</Name>
       <Link>Classes\AAX_AxSalesLine_Extension</Link>
     </Content>
+    <Content Include="AxClass\AAX_AxSalesQuotationLine_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_AxSalesQuotationLine_Extension</Name>
+      <Link>Classes\AAX_AxSalesQuotationLine_Extension</Link>
+    </Content>
+    <Content Include="AxClass\AAX_AxSalesQuotationTable_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_AxSalesQuotationTable_Extension</Name>
+      <Link>Classes\AAX_AxSalesQuotationTable_Extension</Link>
+    </Content>
     <Content Include="AxClass\AAX_AxSalesTable_Extension">
       <SubType>Content</SubType>
       <Name>AAX_AxSalesTable_Extension</Name>
@@ -79,6 +92,11 @@
       <SubType>Content</SubType>
       <Name>AAX_ClearDimensionCache</Name>
       <Link>Classes\AAX_ClearDimensionCache</Link>
+    </Content>
+    <Content Include="AxClass\AAX_ConsignmentReplenishmentOrderHeader_Table_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_ConsignmentReplenishmentOrderHeader_Table_Extension</Name>
+      <Link>Classes\AAX_ConsignmentReplenishmentOrderHeader_Table_Extension</Link>
     </Content>
     <Content Include="AxClass\AAX_CustTable_Extension">
       <SubType>Content</SubType>
@@ -114,6 +132,11 @@
       <SubType>Content</SubType>
       <Name>AAX_InventDim_Extension</Name>
       <Link>Classes\AAX_InventDim_Extension</Link>
+    </Content>
+    <Content Include="AxClass\AAX_InventFallbackWarehouse_Table_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_InventFallbackWarehouse_Table_Extension</Name>
+      <Link>Classes\AAX_InventFallbackWarehouse_Table_Extension</Link>
     </Content>
     <Content Include="AxClass\AAX_InventJournalTrans_Extension">
       <SubType>Content</SubType>
@@ -285,6 +308,26 @@
       <Name>AAX_InventTransferLine_Extension</Name>
       <Link>Classes\AAX_InventTransferLine_Extension</Link>
     </Content>
+    <Content Include="AxClass\AAX_MCRInventTransferTable_Staging_Table_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_MCRInventTransferTable_Staging_Table_Extension</Name>
+      <Link>Classes\AAX_MCRInventTransferTable_Staging_Table_Extension</Link>
+    </Content>
+    <Content Include="AxClass\AAX_MCRPickingWorkbenchProfile_Table_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_MCRPickingWorkbenchProfile_Table_Extension</Name>
+      <Link>Classes\AAX_MCRPickingWorkbenchProfile_Table_Extension</Link>
+    </Content>
+    <Content Include="AxClass\AAX_MCRPickingWorkbenchSession_Table_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_MCRPickingWorkbenchSession_Table_Extension</Name>
+      <Link>Classes\AAX_MCRPickingWorkbenchSession_Table_Extension</Link>
+    </Content>
+    <Content Include="AxClass\AAX_MCRPickingWorkbenchWave_Table_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_MCRPickingWorkbenchWave_Table_Extension</Name>
+      <Link>Classes\AAX_MCRPickingWorkbenchWave_Table_Extension</Link>
+    </Content>
     <Content Include="AxClass\AAX_ProdJournalRoute_EH">
       <SubType>Content</SubType>
       <Name>AAX_ProdJournalRoute_EH</Name>
@@ -320,10 +363,55 @@
       <Name>AAX_PurchTable_Extension</Name>
       <Link>Classes\AAX_PurchTable_Extension</Link>
     </Content>
+    <Content Include="AxClass\AAX_RetailChannelTable_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_RetailChannelTable_Extension</Name>
+      <Link>Classes\AAX_RetailChannelTable_Extension</Link>
+    </Content>
+    <Content Include="AxClass\AAX_RetailInventJournalType_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_RetailInventJournalType_Extension</Name>
+      <Link>Classes\AAX_RetailInventJournalType_Extension</Link>
+    </Content>
+    <Content Include="AxClass\AAX_RetailMCRChannelTable_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_RetailMCRChannelTable_Extension</Name>
+      <Link>Classes\AAX_RetailMCRChannelTable_Extension</Link>
+    </Content>
+    <Content Include="AxClass\AAX_RetailStoreTable_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_RetailStoreTable_Extension</Name>
+      <Link>Classes\AAX_RetailStoreTable_Extension</Link>
+    </Content>
+    <Content Include="AxClass\AAX_SalesBasket_Table_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_SalesBasket_Table_Extension</Name>
+      <Link>Classes\AAX_SalesBasket_Table_Extension</Link>
+    </Content>
+    <Content Include="AxClass\AAX_SalesCreateReleaseOrderTableTmp_Table_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_SalesCreateReleaseOrderTableTmp_Table_Extension</Name>
+      <Link>Classes\AAX_SalesCreateReleaseOrderTableTmp_Table_Extension</Link>
+    </Content>
     <Content Include="AxClass\AAX_SalesLineType_Extension">
       <SubType>Content</SubType>
       <Name>AAX_SalesLineType_Extension</Name>
       <Link>Classes\AAX_SalesLineType_Extension</Link>
+    </Content>
+    <Content Include="AxClass\AAX_SalesQuotationBasket_Table_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_SalesQuotationBasket_Table_Extension</Name>
+      <Link>Classes\AAX_SalesQuotationBasket_Table_Extension</Link>
+    </Content>
+    <Content Include="AxClass\AAX_SalesQuotationLineType_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_SalesQuotationLineType_Extension</Name>
+      <Link>Classes\AAX_SalesQuotationLineType_Extension</Link>
+    </Content>
+    <Content Include="AxClass\AAX_SalesQuotationTable_Table_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_SalesQuotationTable_Table_Extension</Name>
+      <Link>Classes\AAX_SalesQuotationTable_Table_Extension</Link>
     </Content>
     <Content Include="AxClass\AAX_SalesTableType_Extension">
       <SubType>Content</SubType>
@@ -400,6 +488,16 @@
       <Name>AAX_InventStorageDimMap</Name>
       <Link>Maps\AAX_InventStorageDimMap</Link>
     </Content>
+    <Content Include="AxMap\AAX_InventStorageDimMapRetail">
+      <SubType>Content</SubType>
+      <Name>AAX_InventStorageDimMapRetail</Name>
+      <Link>Maps\AAX_InventStorageDimMapRetail</Link>
+    </Content>
+    <Content Include="AxMap\AAX_RetailDimensionDefaultMap">
+      <SubType>Content</SubType>
+      <Name>AAX_RetailDimensionDefaultMap</Name>
+      <Link>Maps\AAX_RetailDimensionDefaultMap</Link>
+    </Content>
     <Content Include="AxMenuExtension\InventoryManagement.Extension_AAX">
       <SubType>Content</SubType>
       <Name>InventoryManagement.Extension_AAX</Name>
@@ -475,6 +573,16 @@
       <Name>PurchTable.Extension_AAX</Name>
       <Link>Table Extensions\PurchTable.Extension_AAX</Link>
     </Content>
+    <Content Include="AxTableExtension\RetailChannelTable.Extension_AAX">
+      <SubType>Content</SubType>
+      <Name>RetailChannelTable.Extension_AAX</Name>
+      <Link>Table Extensions\RetailChannelTable.Extension_AAX</Link>
+    </Content>
+    <Content Include="AxTableExtension\RetailStoreTable.Extension_AAX">
+      <SubType>Content</SubType>
+      <Name>RetailStoreTable.Extension_AAX</Name>
+      <Link>Table Extensions\RetailStoreTable.Extension_AAX</Link>
+    </Content>
     <Content Include="AxTableExtension\SalesTable.Extension_AAX">
       <SubType>Content</SubType>
       <Name>SalesTable.Extension_AAX</Name>
@@ -502,5 +610,5 @@
     </Content>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.Common.targets" />
-  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Dynamics\AX\Microsoft.Dynamics.Framework.Tools.BuildTasks.targets" />
+  <Import Project="$(BuildTasksDirectory)\Microsoft.Dynamics.Framework.Tools.BuildTasks.targets" />
 </Project>

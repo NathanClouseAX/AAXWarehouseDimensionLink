@@ -25,7 +25,7 @@ internal final class AAX_AxPurchLine_Extension //implements AAX_AxInventLocation
 			<Method>
 				<Name>AAX_InventLocationDimensionLink</Name>
 				<Source><![CDATA[
-    protected AAX_InventLocationDimensionLink AAX_InventLocationDimensionLink()
+    public AAX_InventLocationDimensionLink AAX_InventLocationDimensionLink()
     {
         return AAX_InventLocationDimensionLink::newDimensionTables(this.purchLine(), this.axInventDim().inventDim());
     }
