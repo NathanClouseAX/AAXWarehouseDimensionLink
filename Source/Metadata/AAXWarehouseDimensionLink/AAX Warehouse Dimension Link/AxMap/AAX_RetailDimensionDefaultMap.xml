@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxMap xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>AAX_RetailDimensionDefaultMap</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+public class AAX_RetailDimensionDefaultMap extends common
+{
+}
+
+]]></Declaration>
+		<Methods />
+	</SourceCode>
+	<ConfigurationKey>LedgerBasic</ConfigurationKey>
+	<DeveloperDocumentation>@SYS317033</DeveloperDocumentation>
+	<Label>@SYS110288</Label>
+	<FieldGroups />
+	<Fields>
+		<AxMapBaseField xmlns=""
+			i:type="AxMapFieldInt64">
+			<Name>DefaultDimension</Name>
+			<ExtendedDataType>DimensionDefault</ExtendedDataType>
+		</AxMapBaseField>
+	</Fields>
+	<Mappings />
+</AxMap>
