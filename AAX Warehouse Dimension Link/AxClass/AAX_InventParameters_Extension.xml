@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>AAX_InventParameters_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(tableStr(InventParameters))]
+final class AAX_InventParameters_Extension
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>AAX_allowActivateLocationDimensionLink</Name>
+				<Source><![CDATA[
+    public boolean AAX_allowActivateLocationDimensionLink()
+    {
+        return (this.AAX_InventLocationDimensionLink == InventMultiSiteDimensionLink::Inactive)
+        && (this.AAX_LocationDimensionAttribute != 0);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>AAX_allowDeactivateLocationDimensionLink</Name>
+				<Source><![CDATA[
+    public boolean AAX_allowDeactivateLocationDimensionLink()
+    {
+        return this.AAX_InventLocationDimensionLink == InventMultiSiteDimensionLink::Active;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>AAX_allowEditLocationDimension</Name>
+				<Source><![CDATA[
+    public boolean AAX_allowEditLocationDimension()
+    {
+        return this.AAX_InventLocationDimensionLink == InventMultiSiteDimensionLink::Inactive;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>AAX_allowLockLocationDimensionLink</Name>
+				<Source><![CDATA[
+    public boolean AAX_allowLockLocationDimensionLink()
+    {
+        return this.AAX_InventLocationDimensionLink == InventMultiSiteDimensionLink::Active;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>AAX_allowUnlockDimensionLink</Name>
+				<Source><![CDATA[
+    public boolean AAX_allowUnlockDimensionLink()
+    {
+        return this.AAX_InventLocationDimensionLink == InventMultiSiteDimensionLink::Locked;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>AAX_isLocationDimensionLinkInactive</Name>
+				<Source><![CDATA[
+    public boolean AAX_isLocationDimensionLinkInactive()
+    {
+        return this.AAX_InventLocationDimensionLink == InventMultiSiteDimensionLink::Inactive;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>AAX_LocationDimensionAttribute</Name>
+				<Source><![CDATA[
+    public DimensionAttribute AAX_LocationDimensionAttribute()
+    {
+        return DimensionAttribute::find(this.AAX_LocationDimensionAttribute);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>AAX_visibleActivateLocationDimensionLink</Name>
+				<Source><![CDATA[
+    public boolean AAX_visibleActivateLocationDimensionLink()
+    {
+        return this.AAX_InventLocationDimensionLink == InventMultiSiteDimensionLink::Inactive;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>AAX_visibleDeactivateLocationDimensionLink</Name>
+				<Source><![CDATA[
+    public boolean AAX_visibleDeactivateLocationDimensionLink()
+    {
+        return this.AAX_InventLocationDimensionLink != InventMultiSiteDimensionLink::Inactive;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>AAX_visibleLockLocationDimensionLink</Name>
+				<Source><![CDATA[
+    public boolean AAX_visibleLockLocationDimensionLink()
+    {
+        return this.AAX_InventLocationDimensionLink != InventMultiSiteDimensionLink::Locked;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>AAX_visibleUnlockLocationDimensionLink</Name>
+				<Source><![CDATA[
+    public boolean AAX_visibleUnlockLocationDimensionLink()
+    {
+        return this.AAX_InventLocationDimensionLink == InventMultiSiteDimensionLink::Locked;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

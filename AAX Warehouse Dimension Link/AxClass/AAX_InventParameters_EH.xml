@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>AAX_InventParameters_EH</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+class AAX_InventParameters_EH
+{
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>InventParameters_Post_validateField</Name>
+				<Source><![CDATA[
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="args"></param>
+    [PostHandlerFor(tableStr(InventParameters), tableMethodStr(InventParameters, validateField))]
+    public static void InventParameters_Post_validateField(XppPrePostArgs args)
+    {
+        FieldId             FieldId             =   args.getArg(identifierStr(_fieldIdToCheck));
+        InventParameters    InventParameters    =   args.getThis();
+
+        boolean ret;
+
+        switch(FieldId)
+        {
+            case fieldNum(InventParameters, SiteDimensionAttribute):
+            if(InventParameters.SiteDimensionAttribute == InventParameters::find().AAX_LocationDimensionAttribute)
+                {
+                    //todo use label
+                    ret = checkFailed(strFmt("??"));
+                    args.setReturnValue(ret);
+                }
+                break;
+        }
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

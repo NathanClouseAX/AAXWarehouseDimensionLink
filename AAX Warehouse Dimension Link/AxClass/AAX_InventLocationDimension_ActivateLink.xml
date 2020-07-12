@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>AAX_InventLocationDimension_ActivateLink</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+public class AAX_InventLocationDimension_ActivateLink
+{
+    InventParameters    InventParameters;
+    dimensionAttribute  dimensionAttribute;
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>new</Name>
+				<Source><![CDATA[
+    protected void new()
+    {
+        InventParameters    = InventParameters::find();
+        
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>run</Name>
+				<Source><![CDATA[
+    /// <summary>
+    ///    Contains the code that does the actual job of the class.
+    /// </summary>
+    public void run()
+    {
+        #OCCRetryCount
+
+        if (!this.validate())
+            return;
+
+        try
+        {
+            ttsbegin;
+
+            InventParameters = InventParameters::find(true);
+            InventParameters.AAX_InventLocationDimensionLink = InventMultiSiteDimensionLink::Active;
+            InventParameters.update();
+
+            ttscommit;
+        }
+        catch (Exception::Deadlock)
+        {
+            retry;
+        }
+        catch (Exception::UpdateConflict)
+        {
+            if (appl.ttsLevel() == 0)
+            {
+                if (xSession::currentRetryCount() >= #RetryNum)
+                    throw Exception::UpdateConflictNotRecovered;
+                else
+                    retry;
+            }
+            else
+            {
+                throw Exception::UpdateConflict;
+            }
+        }
+        catch(Exception::Error)
+        {
+            throw Error("Update Cancelled");
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>validate</Name>
+				<Source><![CDATA[
+    public boolean validate()
+    {
+        boolean ret = true;
+
+        InventParameters = InventParameters::find();
+
+        select * from dimensionAttribute
+            where dimensionAttribute.Type != DimensionAttributeType::DynamicAccount
+                && dimensionAttribute.RecId == InventParameters.AAX_LocationDimensionAttribute;
+
+        if(!dimensionAttribute)
+        {
+            ret = checkFailed(strFmt("Dimension attribute %1 associated with warehouses is not activate in the ledger",  InventParameters.AAX_LocationDimensionAttribute().localizedName()));
+        }
+
+
+        if (ret && !InventParameters.AAX_allowActivateLocationDimensionLink())
+        {
+            ret = checkFailed("@SYS109417");
+        }
+
+        if (ret && !this.validateInventLocation())
+        {
+            ret = checkFailed("@SYS109396");
+        }
+
+        return ret;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>validateInventLocation</Name>
+				<Source><![CDATA[
+    protected boolean validateInventLocation()
+    {
+        InventLocation          InventLocation;
+        boolean             ok = true;
+
+        InventParameters = InventParameters::find();
+
+        while select InventLocation
+        {
+            if (InventLocation.AAX_dimensionAttributeValue() == 0)
+            {
+                ok = checkFailed(strFmt("@SYS109397", InventLocation.InventLocationId, InventParameters.AAX_LocationDimensionAttribute().localizedName()));
+            }
+        }
+        return ok;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>construct</Name>
+				<Source><![CDATA[
+    public static AAX_InventLocationDimension_ActivateLink construct()
+    {
+        return new AAX_InventLocationDimension_ActivateLink();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>main</Name>
+				<Source><![CDATA[
+    public static void main(Args args)
+    {
+        AAX_InventLocationDimension_ActivateLink    AAX_InventLocationDimension_ActivateLink = AAX_InventLocationDimension_ActivateLink::construct();
+
+        AAX_InventLocationDimension_ActivateLink.run();
+
+        if (args)
+        {
+            Common common = args.record();
+            if (FormDataUtil::isFormDataSource(common))
+            {
+                FormDataSource formDataSource = FormDataUtil::getFormDataSource(common);
+                formDataSource.executeQuery();
+            }
+
+            if (FormDataUtil::isFormDataSource(common) && InventParameters::find().AAX_InventLocationDimensionLink == InventMultiSiteDimensionLink::Active)
+            {
+                MenuFunction inventLocationDimensionUpdateMenu = new MenuFunction(menuitemActionStr(AAX_InventLocationDimensionUpdate), MenuItemType::Action);
+                if (inventLocationDimensionUpdateMenu.checkAccessRights())
+                {
+                    inventLocationDimensionUpdateMenu.run();
+                }
+            }
+        }
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

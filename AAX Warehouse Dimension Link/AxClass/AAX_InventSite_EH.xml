@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>AAX_InventSite_EH</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+class AAX_InventSite_EH
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>InventSite_Post_insert</Name>
+				<Source><![CDATA[
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="args"></param>
+    [PostHandlerFor(tableStr(InventSite), tableMethodStr(InventSite, insert))]
+    public static void InventSite_Post_insert(XppPrePostArgs args)
+    {
+        InventSite    InventSite    =   args.getThis();
+
+        DimensionDefaultFacade::copyDimensionValueToDefaultDimensionField(InventSite, fieldNum(InventSite, SiteID), InventSite, fieldNum(InventSite, DefaultDimension));
+   
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>InventDim_Post_validateField</Name>
+				<Source><![CDATA[
+    [PostHandlerFor(tableStr(InventSite), tableMethodStr(InventSite, validateField))]
+    public static void InventDim_Post_validateField(XppPrePostArgs args)
+    {
+
+        boolean             ret = args.getReturnValue();
+        FieldId             p1 = args.getArg(identifierStr(_fieldIdToCheck));
+            
+        InventSite           InventSite = args.getThis();
+
+        switch (p1)
+        {
+
+            case fieldNum (InventSite, DefaultDimension):
+                InventParameters inventParameters = InventParameters::find();
+                if (!inventParameters.isMultiSiteDimensionLinkInactive())
+                {
+                    if (inventParameters.siteDimensionAttribute().RecId &&
+                        inventParameters.siteDimensionAttribute().CopyValuesOnCreate &&
+                        InventSite.dimensionAttributeValue() == 0)
+                    {
+                        //THIS IS GARBAGE - clean it up
+                        InfoLog.clear();
+                        //defaulting will get it so lets override that false positive in this instance
+                        ret = true;
+                    }
+                }
+                break;
+        }
+
+        args.setReturnValue(ret);
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

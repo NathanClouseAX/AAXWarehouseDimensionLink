@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>AAX_InventTransferLine_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(tableStr(InventTransferLine))]
+public final class AAX_InventTransferLine_Extension
+{
+    
+    
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>initFromInventTable</Name>
+				<Source><![CDATA[
+    public void initFromInventTable(InventTable _inventTable, InventDimId _inventDimId)
+    {
+        InventDim InventDim = this.inventDimTransitFrom(this.inventTransferTable());
+        InventDim InventDImTo = this.inventDimTransitTo(this.inventTransferTable());
+
+        next initFromInventTable(_inventTable, _inventDimId);
+
+        this.DimensionDefaultShipFrom = DimensionDefaultFacade::serviceMergeDefaultDimensions(this.DimensionDefaultShipFrom, InventLocation::AAX_changeDimension(_InventTable.DefaultDimension, InventDim.InventLocationId, false));
+
+        this.DimensionDefaultShipTo   = DimensionDefaultFacade::serviceMergeDefaultDimensions(this.DimensionDefaultShipTo,   InventLocation::AAX_changeDimension(_InventTable.DefaultDimension, InventDimTo.InventLocationId, false));
+   
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

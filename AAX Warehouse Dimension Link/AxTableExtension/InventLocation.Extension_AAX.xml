@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxTableExtension xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>InventLocation.Extension_AAX</Name>
+	<FieldGroupExtensions />
+	<FieldGroups />
+	<FieldModifications />
+	<Fields>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldInt64">
+			<Name>AAX_DefaultDimension</Name>
+			<ExtendedDataType>AAX_InventLocationLockedDimensionValueSet</ExtendedDataType>
+		</AxTableField>
+	</Fields>
+	<Indexes />
+	<Mappings>
+		<AxTableMapping>
+			<MappingTable>DimensionDefaultMap</MappingTable>
+			<Connections>
+				<AxTableMappingConnection>
+					<MapField>DefaultDimension</MapField>
+					<MapFieldTo>AAX_DefaultDimension</MapFieldTo>
+				</AxTableMappingConnection>
+			</Connections>
+		</AxTableMapping>
+	</Mappings>
+	<PropertyModifications />
+	<RelationExtensions />
+	<Relations>
+		<AxTableRelation xmlns=""
+			i:type="AxTableRelationForeignKey">
+			<Name>AAX_DefaultDimension</Name>
+			<Cardinality>ZeroMore</Cardinality>
+			<RelatedTable>DimensionAttributeValueSetItem</RelatedTable>
+			<RelatedTableCardinality>ZeroOne</RelatedTableCardinality>
+			<RelatedTableRole>DefaultDimension</RelatedTableRole>
+			<RelationshipType>Association</RelationshipType>
+			<Role>DefaultDimension_InventLocation</Role>
+			<UseDefaultRoleNames>No</UseDefaultRoleNames>
+			<Constraints>
+				<AxTableRelationConstraint xmlns=""
+					i:type="AxTableRelationConstraintField">
+					<Name>AAX_DefaultDimension</Name>
+					<Field>AAX_DefaultDimension</Field>
+					<RelatedField>RecId</RelatedField>
+				</AxTableRelationConstraint>
+			</Constraints>
+			<Index>RecId</Index>
+		</AxTableRelation>
+	</Relations>
+</AxTableExtension>

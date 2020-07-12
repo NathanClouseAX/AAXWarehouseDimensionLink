@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>AAX_AxSalesLine_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(classStr(AxSalesLine))]
+public final class AAX_AxSalesLine_Extension //implements AAX_AxInventLocationDimensionable
+{
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>setDefaultDimension</Name>
+				<Source><![CDATA[
+    protected void setDefaultDimension()
+    {
+        boolean headerDefaultDimensionChanged = this.axSalesTable().isFieldModified(fieldNum(SalesTable, DefaultDimension));
+        this.AAX_InventLocationDimensionLink().axSetDefaultDimension(this, headerDefaultDimensionChanged);
+
+        next setDefaultDimension();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>setDimension</Name>
+				<Source><![CDATA[
+    protected void setDimension()
+    {
+        this.AAX_InventLocationDimensionLink().axSetDefaultDimension(this);
+
+        next setDimension();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>AAX_InventLocationDimensionLink</Name>
+				<Source><![CDATA[
+    public AAX_InventLocationDimensionLink AAX_InventLocationDimensionLink()
+    {
+        return AAX_InventLocationDimensionLink::newDimensionTables(this.salesLine(), this.axInventDim().inventDim());
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

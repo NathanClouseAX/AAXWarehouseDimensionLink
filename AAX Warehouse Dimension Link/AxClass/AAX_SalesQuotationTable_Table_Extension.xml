@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>AAX_SalesQuotationTable_Table_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(tableStr(SalesQuotationTable))]
+public final class AAX_SalesQuotationTable_Table_Extension
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>modifiedField</Name>
+				<Source><![CDATA[
+    public void modifiedField(FieldId _fieldId, boolean _userInput)
+    {
+        next modifiedField(_fieldId);
+
+        switch (_fieldId)
+        {
+            case fieldNum(SalesQuotationTable, InventSiteId):
+                this.AAX_InventStorageDimMap::modifiedField(fieldNum(AAX_InventStorageDimMap, InventSiteID));
+                if (!this.RecId)
+                {
+                    SalesCalcAvailableDlvDates::initDateFieldsOrderEntryDeadline(this);
+                }
+                this.modifiedInventSiteFromParent();
+                this.setListCode();
+                break;
+            case fieldNum(SalesQuotationTable, InventLocationId):
+                this.AAX_InventStorageDimMap::modifiedField(fieldNum(AAX_InventStorageDimMap, InventLocationID));
+                this.setListCode();
+                break;
+        }
+        this.modifiedFieldDDC(_fieldId, _userInput);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>modifiedInventSiteFromParent</Name>
+				<Source><![CDATA[
+    public void modifiedInventSiteFromParent(Common _parent)
+    {
+        next modifiedInventSiteFromParent(_parent);
+        this.AAX_InventStorageDimMap::modifiedInventSiteFromParent(_parent);
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

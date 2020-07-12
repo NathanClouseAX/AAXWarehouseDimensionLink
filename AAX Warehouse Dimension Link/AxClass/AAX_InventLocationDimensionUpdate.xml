@@ -1,0 +1,1719 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>AAX_InventLocationDimensionUpdate</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+class AAX_InventLocationDimensionUpdate extends RunBaseBatch
+{
+    InventParameters    InventParameters;
+    RecId               LocationDimensionAttribute;
+    int                 commitFrequency;
+
+    Set                 setErrorRecIds;
+    int                 errorCount;
+    List                listErrors;
+    TableId             updateTableId;
+    str                 prefix;
+
+    int                 line;
+
+    #OCCRetryCount
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>dialog</Name>
+				<Source><![CDATA[
+    /// <summary>
+    ///    Returns a class that contains the methods that are described by the <c>RunBaseDialogable</c>
+    ///    interface.
+    /// </summary>
+    /// <returns>
+    ///    A class that contains the methods that are described by the <c>RunBaseDialogable</c> interface.
+    /// </returns>
+    /// <remarks>
+    ///    A dialog can be built by using the <c>Dialog</c> class or by using a class that is created in the
+    ///    Application Object Tree (AOT).
+    /// </remarks>
+    Object dialog()
+    {
+        #define.textWidth(60)
+        #define.textHeight(10)
+        DialogRunbase   dialog = super();
+        DialogField     dialogField;
+
+        dialog = super();
+
+        dialogField = dialog.addFieldValue(extendedTypeStr(Notes),strFmt("The %1 dimension on all open transactions will be updated to match the Warehouse dimension.", InventParameters.AAX_LocationDimensionAttribute().Name));
+        dialogField.showLabel(false);
+        dialogField.border(1);
+        dialogField.allowEdit(false);
+        dialogField.displayHeight(#textHeight);
+        dialogField.displayLength(#textWidth);
+
+        return dialog;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>getDimensionUpdateExplanationTex</Name>
+				<Source><![CDATA[
+    private str getDimensionUpdateExplanationTex(Name _dimensionName)
+    {
+        str dimensionName;
+        if (_dimensionName == '')
+        {
+            dimensionName = "@SCM:CostDimensionNotSet";
+        }
+        else
+        {
+            //todo use correct label
+            dimensionName = strFmt("@SYS111442", _dimensionName);
+        }
+        return dimensionName;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>getRecordPrefix</Name>
+				<Source><![CDATA[
+    /// <summary>
+    ///    Builds and returns the prefix for a specific table buffer.
+    /// </summary>
+    /// <param name="_common">
+    ///    The table buffer to build the prefix for.
+    /// </param>
+    /// <param name="_conPrefixFields">
+    ///    The field numbers that should be included in the prefix.
+    /// </param>
+    /// <returns>
+    ///    The prefix for a specific table buffer.
+    /// </returns>
+    protected str getRecordPrefix(Common _common,container _conPrefixFields)
+    {
+        str     fieldText = '';
+        int     i;
+
+        for (i = 1; i <= conLen(_conPreFixFields); i++)
+        {
+            if (fieldText)
+            {
+                fieldText += ' ';
+            }
+
+            fieldText += fieldLabelValue(_common.TableId,
+                                         conPeek(_conPrefixFields,i),
+                                         _common.(conPeek(_conPrefixFields,i)));
+        }
+
+        return fieldText;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>hasError</Name>
+				<Source><![CDATA[
+    /// <summary>
+    ///    Specifies whether the record buffer received an error during processing.
+    /// </summary>
+    /// <param name="_common">
+    ///    The record buffer to examine.
+    /// </param>
+    /// <returns>
+    ///    true if the record buffer received an error during processing; otherwise false.
+    /// </returns>
+    protected boolean hasError(Common _common)
+    {
+        //Reset the error list (but not the error count) if the table changes
+        if (!updateTableId || _common.TableId != updateTableId)
+        {
+            setErrorRecIds = new Set(Types::Int64);
+            updateTableId  = _common.TableId;
+        }
+
+        //Save the current prefix
+        prefix = getPrefix();
+
+        return setErrorRecIds.in(_common.RecId);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>manageUpdateError</Name>
+				<Source><![CDATA[
+    /// <summary>
+    ///    Handles any errors that occur during the update of a record.
+    /// </summary>
+    /// <param name="_common">
+    ///    The record to update.
+    /// </param>
+    /// <exception cref="M:Exception::Error">
+    ///    There were more than 1000 errors. The update is canceled.
+    /// </exception>
+    protected void manageUpdateError(Common _common)
+    {
+        int fromLineNo;
+
+        if (errorCount < 1000)
+        {
+            errorCount++;
+            setErrorRecIds.add(_common.RecId);
+
+            //Since the errors enbetween the try/catch will be removed when doing a retry,
+            //these messages that are within the current prefix scope are saved for later use
+            int lineNo = infologLine();
+            while (strFind(infolog.text(lineNo), prefix, 0, 1))
+            {
+                fromLineNo = lineNo;
+                lineNo--;
+            }
+            for (lineNo = fromLineNo; lineNo <= infologLine(); lineNo++)
+            {
+                listErrors.addEnd(infolog.text(lineNo));
+            }
+            listErrors.addEnd(prefix + "@SYS122667");
+        }
+        else
+        {
+            this.showErrors();
+            throw error(strFmt("@SYS122668",1000));
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>mcrUpdateMCROrderEventTable</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Updates the <c>MCROrderEventTable</c> record.
+    /// </summary>
+    protected void mcrUpdateMCROrderEventTable()
+    {
+        MCROrderEventTable      mcrOrderEventTable;
+        InventDim               inventDim;
+        InventLocation              InventLocation;
+        SalesLine               salesLine;
+
+        progress.setText(tablepname(mcrOrderEventTable));
+        progress.incCount();
+        setprefix(tableid2pname(mcrOrderEventTable.TableId));
+
+        try
+        {
+            line = 0;
+            while select optimisticlock mcrOrderEventTable
+                join SalesStatus from salesLine
+                where salesLine.SalesId             == mcrOrderEventTable.SalesId
+                    && (salesLine.SalesStatus       == SalesStatus::None
+                        || salesLine.SalesStatus    == SalesStatus::Backorder
+                        || salesLine.SalesStatus    == SalesStatus::Delivered)
+                join TableId from inventDim
+                    where inventDim.InventDimId     == mcrOrderEventTable.InventDimId
+                join InventLocation
+                    where InventLocation.InventLocationId         == inventDim.InventLocationId
+            {
+                setprefix(this.getRecordPrefix(mcrOrderEventTable, [fieldnum(MCROrderEventTable, SalesID), fieldnum(MCROrderEventTable, MCROrderEventType)]));
+                this.updateDimension(mcrOrderEventTable, InventLocation);
+            }
+            if (line != 0)
+            {
+                ttscommit;
+            }
+        }
+        catch (Exception::Deadlock)
+        {
+            retry;
+        }
+        catch (Exception::UpdateConflict)
+        {
+            if (appl.ttsLevel() == 0)
+            {
+                if (xSession::currentRetryCount() >= #RetryNum)
+                {
+                    throw Exception::UpdateConflictNotRecovered;
+                }
+                else
+                {
+                    retry;
+                }
+            }
+            else
+            {
+                throw Exception::UpdateConflict;
+            }
+        }
+        catch (Exception::Error)
+        {
+            this.manageUpdateError(mcrOrderEventTable);
+            retry;
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>new</Name>
+				<Source><![CDATA[
+    protected void new()
+    {
+        super();
+
+        InventParameters = InventParameters::find();
+        LocationDimensionAttribute = InventParameters.AAX_LocationDimensionAttribute;
+
+        commitFrequency = 100;
+        listErrors      = new List(Types::String);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>run</Name>
+				<Source><![CDATA[
+    /// <summary>
+    ///    Contains the code that does the actual job of the class.
+    /// </summary>
+    public void run()
+    {
+        if (!this.validate())
+        {
+            return;
+        }
+
+        this.progressInit("@SYS8516", 14, #AviUpdate);
+
+        this.updateForecastPurch();
+        this.updateForecastSales();
+        this.updateInventJournalTrans();
+        this.updateInventNonConformanceTable();
+        this.updateInventQualityOrderTable();
+        this.updateInventQuarantineOrder();
+        this.updateProdTable();
+        this.updateProdBOM();
+        this.updateProdRoute();
+        this.updateProdJournalRoute();
+        this.updateProdJournalBOM();
+        this.updatePurchLine();
+        this.updatePurchReqLine();
+        this.updatePurchRFQCaseLine();
+        this.updatePurchRFQLine();
+        this.updateSalesLine();
+        this.updateSalesQuotationLine();
+        this.updateSMAAgreementLine();
+        this.updateSMAServiceOrderLine();
+        this.mcrUpdateMCROrderEventTable();
+
+        this.showErrors();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>runsImpersonated</Name>
+				<Source><![CDATA[
+    /// <summary>
+    ///    Determines whether the batch task is run on the server or on a client.
+    /// </summary>
+    /// <returns>
+    ///    true if the task is run on the server; otherwise, false.
+    /// </returns>
+    /// <remarks>
+    ///    Your classes that extend <c>RunBaseBatch</c> must override the <c>runsImpersonated</c> method and
+    ///    return false if you want those tasks to run on a client.
+    /// </remarks>
+    public boolean runsImpersonated()
+    {
+        return true;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>showErrors</Name>
+				<Source><![CDATA[
+    /// <summary>
+    ///    Adds all the handled errors to the Infolog.
+    /// </summary>
+    protected void showErrors()
+    {
+        ListEnumerator  listEnumerator = listErrors.getEnumerator();
+
+        while (listEnumerator.moveNext())
+        {
+            //Called with buildprefix=false since the prefixing was already done
+            //when the errors was added to the listErrors
+
+            infolog.add(Exception::Error,listEnumerator.current(),'',null,false);
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>unpack</Name>
+				<Source><![CDATA[
+    public boolean unpack(container packedClass)
+    {
+        boolean ret = true;
+
+        return ret;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>updateDimension</Name>
+				<Source><![CDATA[
+    /// <summary>
+    ///    Updates the buffer dimension to match the <c>InventLocation</c> table linked dimension.
+    /// </summary>
+    /// <param name="_common">
+    ///    The buffer to be updated.
+    /// </param>
+    /// <param name="_InventLocation">
+    ///    The <c>InventLocation</c> record from which the dimension attribute value is taken.
+    /// </param>
+    /// <param name="_callDoUpdate">
+    ///    Indicates whether <c>doUpdate</c> should be called on the buffer instead of <c>update</c>; optional.
+    /// </param>
+    private void updateDimension(Common _common, InventLocation _InventLocation, boolean _callDoUpdate = false)
+    {
+        DimensionDefaultMap                 dimensionDefaultMap = _common;
+        if ((!_InventLocation.AAX_locationDimensionEquals(dimensionDefaultMap.DefaultDimension)) &&
+            (!this.hasError(_common)))
+        {
+            if (line == 0)
+            {
+                ttsbegin;
+            }
+
+            dimensionDefaultMap.DefaultDimension = LedgerDimensionDefaultFacade::serviceReplaceAttributeValue(dimensionDefaultMap.DefaultDimension, _InventLocation.AAX_DefaultDimension, locationDimensionAttribute);
+
+            if (_callDoUpdate)
+            {
+                _common.doUpdate();
+            }
+            else
+            {
+                _common.update();
+            }
+
+            line ++;
+            if (line == commitFrequency)
+            {
+                ttscommit;
+                line = 0;
+            }
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>updateForecastPurch</Name>
+				<Source><![CDATA[
+    protected void updateForecastPurch()
+    {
+        ForecastPurch   forecastPurch;
+        InventDim   inventDim;
+        InventLocation  InventLocation;
+
+        progress.setText(tablePName(ForecastPurch));
+        progress.incCount();
+
+        setPrefix(tableId2pname(forecastPurch.TableId));
+
+        try
+        {
+            line = 0;
+            while select optimisticlock forecastPurch
+                where forecastPurch.StartDate >= DateTimeUtil::getSystemDate(DateTimeUtil::getUserPreferredTimeZone())
+                join TableId from inventDim
+                where inventDim.InventDimId == forecastPurch.InventDimId
+                join InventLocation
+                where InventLocation.InventLocationId == inventDim.InventLocationId
+            {
+                setPrefix(this.getRecordPrefix(forecastPurch, [fieldNum(ForecastPurch,ModelId),fieldNum(ForecastPurch,ItemId)]));
+                this.updateDimension(forecastPurch, InventLocation);
+            }
+            if (line != 0)
+            {
+                ttscommit;
+            }
+        }
+        catch (Exception::Deadlock)
+        {
+            retry;
+        }
+        catch (Exception::UpdateConflict)
+        {
+            if (appl.ttsLevel() == 0)
+            {
+                if (xSession::currentRetryCount() >= #RetryNum)
+                {
+                    throw Exception::UpdateConflictNotRecovered;
+                }
+                else
+                {
+                    retry;
+                }
+            }
+            else
+            {
+                throw Exception::UpdateConflict;
+            }
+        }
+        catch (Exception::Error)
+        {
+            this.manageUpdateError(forecastPurch);
+            retry;
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>updateForecastSales</Name>
+				<Source><![CDATA[
+    protected void updateForecastSales()
+    {
+        ForecastSales   forecastSales;
+        InventDim   inventDim;
+        InventLocation  InventLocation;
+
+        progress.setText(tablePName(ForecastSales));
+        progress.incCount();
+
+        setPrefix(tableId2pname(forecastSales.TableId));
+
+        try
+        {
+            line = 0;
+            while select optimisticlock forecastSales
+                where forecastSales.StartDate >= DateTimeUtil::getSystemDate(DateTimeUtil::getUserPreferredTimeZone())
+                join TableId from inventDim
+                where inventDim.InventDimId == forecastSales.InventDimId
+                join InventLocation
+                where InventLocation.InventLocationId == inventDim.InventLocationId
+            {
+                setPrefix(this.getRecordPrefix(forecastSales, [fieldNum(ForecastSales,ModelId),fieldNum(ForecastSales,ItemId)]));
+                this.updateDimension(forecastSales, InventLocation);
+            }
+            if (line != 0)
+            {
+                ttscommit;
+            }
+        }
+        catch (Exception::Deadlock)
+        {
+            retry;
+        }
+        catch (Exception::UpdateConflict)
+        {
+            if (appl.ttsLevel() == 0)
+            {
+                if (xSession::currentRetryCount() >= #RetryNum)
+                {
+                    throw Exception::UpdateConflictNotRecovered;
+                }
+                else
+                {
+                    retry;
+                }
+            }
+            else
+            {
+                throw Exception::UpdateConflict;
+            }
+        }
+        catch (Exception::Error)
+        {
+            this.manageUpdateError(forecastSales);
+            retry;
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>updateInventJournalTrans</Name>
+				<Source><![CDATA[
+    protected void updateInventJournalTrans()
+    {
+        InventJournalTrans     inventJournalTrans;
+        InventJournalTable   inventJournalTable;
+        InventDim   inventDim;
+        InventLocation  InventLocation;
+
+        progress.setText(tablePName(InventJournalTrans));
+        progress.incCount();
+
+        setPrefix(tableId2pname(inventJournalTrans.TableId));
+
+        try
+        {
+            line = 0;
+            while select optimisticlock inventJournalTrans
+                join TableId from inventJournalTable
+                where inventJournalTable.JournalId == inventJournalTrans.JournalId
+                   && inventJournalTable.Posted    != NoYes::Yes
+                join TableId from inventDim
+                where inventDim.InventDimId == inventJournalTrans.InventDimId
+                join InventLocation
+                where InventLocation.InventLocationId == inventDim.InventLocationId
+            {
+                setPrefix(this.getRecordPrefix(inventJournalTrans, [fieldNum(InventJournalTrans,JournalId),fieldNum(InventJournalTrans,LineNum)]));
+                this.updateDimension(inventJournalTrans, InventLocation);
+            }
+            if (line != 0)
+            {
+                ttscommit;
+            }
+        }
+        catch (Exception::Deadlock)
+        {
+            retry;
+        }
+        catch (Exception::UpdateConflict)
+        {
+            if (appl.ttsLevel() == 0)
+            {
+                if (xSession::currentRetryCount() >= #RetryNum)
+                {
+                    throw Exception::UpdateConflictNotRecovered;
+                }
+                else
+                {
+                    retry;
+                }
+            }
+            else
+            {
+                throw Exception::UpdateConflict;
+            }
+        }
+        catch (Exception::Error)
+        {
+            this.manageUpdateError(inventJournalTrans);
+            retry;
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>updateInventNonConformanceTable</Name>
+				<Source><![CDATA[
+    protected void updateInventNonConformanceTable()
+    {
+        InventNonConformanceTable   inventNonConformanceTable;
+        InventDim                   inventDim;
+        InventLocation                  InventLocation;
+
+        progress.setText(tablePName(InventNonConformanceTable));
+        progress.incCount();
+
+        setPrefix(tableId2pname(inventNonConformanceTable.TableId));
+
+        try
+        {
+            line = 0;
+            while select optimisticlock inventNonConformanceTable
+                where inventNonConformanceTable.Closed == NoYes::No
+                join TableId from inventDim
+                where inventDim.InventDimId == inventNonConformanceTable.InventDimId
+                join InventLocation
+                where InventLocation.InventLocationId == inventDim.InventLocationId
+            {
+                setPrefix(this.getRecordPrefix(inventNonConformanceTable, [fieldNum(InventNonConformanceTable, InventNonConformanceID)]));
+                this.updateDimension(inventNonConformanceTable, InventLocation);
+            }
+            if (line != 0)
+            {
+                ttscommit;
+            }
+        }
+        catch (Exception::Deadlock)
+        {
+            retry;
+        }
+        catch (Exception::UpdateConflict)
+        {
+            if (appl.ttsLevel() == 0)
+            {
+                if (xSession::currentRetryCount() >= #RetryNum)
+                {
+                    throw Exception::UpdateConflictNotRecovered;
+                }
+                else
+                {
+                    retry;
+                }
+            }
+            else
+            {
+                throw Exception::UpdateConflict;
+            }
+        }
+        catch (Exception::Error)
+        {
+            this.manageUpdateError(inventNonConformanceTable);
+            retry;
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>updateInventQualityOrderTable</Name>
+				<Source><![CDATA[
+    protected void updateInventQualityOrderTable()
+    {
+        InventQualityOrderTable inventQualityOrderTable;
+        InventDim               inventDim;
+        InventLocation              InventLocation;
+
+        progress.setText(tablePName(InventQualityOrderTable));
+        progress.incCount();
+
+        setPrefix(tableId2pname(inventQualityOrderTable.TableId));
+
+        try
+        {
+            line = 0;
+            while select optimisticlock inventQualityOrderTable
+                where inventQualityOrderTable.OrderStatus == InventTestOrderStatus::Open
+                join TableId from inventDim
+                where inventDim.InventDimId == inventQualityOrderTable.InventDimId
+                join InventLocation
+                where InventLocation.InventLocationId == inventDim.InventLocationId
+            {
+                setPrefix(this.getRecordPrefix(inventQualityOrderTable, [fieldNum(InventQualityOrderTable, QualityOrderId)]));
+                this.updateDimension(inventQualityOrderTable, InventLocation);
+            }
+            if (line != 0)
+            {
+                ttscommit;
+            }
+        }
+        catch (Exception::Deadlock)
+        {
+            retry;
+        }
+        catch (Exception::UpdateConflict)
+        {
+            if (appl.ttsLevel() == 0)
+            {
+                if (xSession::currentRetryCount() >= #RetryNum)
+                {
+                    throw Exception::UpdateConflictNotRecovered;
+                }
+                else
+                {
+                    retry;
+                }
+            }
+            else
+            {
+                throw Exception::UpdateConflict;
+            }
+        }
+        catch (Exception::Error)
+        {
+            this.manageUpdateError(inventQualityOrderTable);
+            retry;
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>updateInventQuarantineOrder</Name>
+				<Source><![CDATA[
+    protected void updateInventQuarantineOrder()
+    {
+        InventQuarantineOrder     inventQuarantineOrder;
+        InventDim   inventDim;
+        InventLocation  InventLocation;
+
+        progress.setText(tablePName(InventQuarantineOrder));
+        progress.incCount();
+
+        setPrefix(tableId2pname(inventQuarantineOrder.TableId));
+
+        try
+        {
+            line = 0;
+            while select optimisticlock inventQuarantineOrder
+                where inventQuarantineOrder.Status != InventQuarantineStatus::Ended
+                join TableId from inventDim
+                where inventDim.InventDimId == inventQuarantineOrder.InventDimId
+                join InventLocation
+                where InventLocation.InventLocationId == inventDim.InventLocationId
+            {
+                setPrefix(this.getRecordPrefix(inventQuarantineOrder, [fieldNum(InventQuarantineOrder,QuarantineId)]));
+                this.updateDimension(inventQuarantineOrder, InventLocation);
+            }
+            if (line != 0)
+            {
+                ttscommit;
+            }
+        }
+        catch (Exception::Deadlock)
+        {
+            retry;
+        }
+        catch (Exception::UpdateConflict)
+        {
+            if (appl.ttsLevel() == 0)
+            {
+                if (xSession::currentRetryCount() >= #RetryNum)
+                {
+                    throw Exception::UpdateConflictNotRecovered;
+                }
+                else
+                {
+                    retry;
+                }
+            }
+            else
+            {
+                throw Exception::UpdateConflict;
+            }
+        }
+        catch (Exception::Error)
+        {
+            this.manageUpdateError(inventQuarantineOrder);
+            retry;
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>updateProdBOM</Name>
+				<Source><![CDATA[
+    protected void updateProdBOM()
+    {
+        ProdBOM     prodBOM;
+        ProdTable   prodTable;
+        InventDim   inventDim;
+        InventLocation  InventLocation;
+
+        progress.setText(tablePName(ProdBOM));
+        progress.incCount();
+
+        setPrefix(tableId2pname(prodBOM.TableId));
+
+        try
+        {
+            line = 0;
+            while select optimisticlock prodBOM
+                join TableId from prodTable
+                where prodTable.ProdId == prodBOM.ProdId
+                   && prodTable.ProdStatus != ProdStatus::Completed
+                join TableId from inventDim
+                where inventDim.InventDimId == prodBOM.InventDimId
+                join InventLocation
+                where InventLocation.InventLocationId == inventDim.InventLocationId
+            {
+                setPrefix(this.getRecordPrefix(prodBOM, [fieldNum(ProdBOM,ProdId),fieldNum(ProdBOM,ItemId)]));
+                this.updateDimension(prodBOM, InventLocation);
+            }
+            if (line != 0)
+            {
+                ttscommit;
+            }
+        }
+        catch (Exception::Deadlock)
+        {
+            retry;
+        }
+        catch (Exception::UpdateConflict)
+        {
+            if (appl.ttsLevel() == 0)
+            {
+                if (xSession::currentRetryCount() >= #RetryNum)
+                {
+                    throw Exception::UpdateConflictNotRecovered;
+                }
+                else
+                {
+                    retry;
+                }
+            }
+            else
+            {
+                throw Exception::UpdateConflict;
+            }
+        }
+        catch (Exception::Error)
+        {
+            this.manageUpdateError(prodBOM);
+            retry;
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>updateProdJournalBOM</Name>
+				<Source><![CDATA[
+    protected void updateProdJournalBOM()
+    {
+        ProdJournalBOM     prodJournalBOM;
+        ProdJournalTable   prodJournalTable;
+        InventDim   inventDim;
+        InventLocation  InventLocation;
+
+        progress.setText(tablePName(ProdJournalBOM));
+        progress.incCount();
+
+        setPrefix(tableId2pname(prodJournalBOM.TableId));
+
+        try
+        {
+            line = 0;
+            while select optimisticlock prodJournalBOM
+                join TableId from prodJournalTable
+                where prodJournalTable.JournalId == prodJournalBOM.JournalId
+                   && prodJournalTable.Posted    != NoYes::Yes
+                join TableId from inventDim
+                where inventDim.InventDimId == prodJournalBOM.InventDimId
+                join InventLocation
+                where InventLocation.InventLocationId == inventDim.InventLocationId
+            {
+                setPrefix(this.getRecordPrefix(prodJournalBOM, [fieldNum(ProdJournalBOM,ProdId),fieldNum(ProdJournalBOM,JournalId),fieldNum(ProdJournalBOM,LineNum)]));
+                this.updateDimension(prodJournalBOM, InventLocation);
+            }
+            if (line != 0)
+            {
+                ttscommit;
+            }
+        }
+        catch (Exception::Deadlock)
+        {
+            retry;
+        }
+        catch (Exception::UpdateConflict)
+        {
+            if (appl.ttsLevel() == 0)
+            {
+                if (xSession::currentRetryCount() >= #RetryNum)
+                {
+                    throw Exception::UpdateConflictNotRecovered;
+                }
+                else
+                {
+                    retry;
+                }
+            }
+            else
+            {
+                throw Exception::UpdateConflict;
+            }
+        }
+        catch (Exception::Error)
+        {
+            this.manageUpdateError(prodJournalBOM);
+            retry;
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>updateProdJournalRoute</Name>
+				<Source><![CDATA[
+    protected void updateProdJournalRoute()
+    {
+        ProdJournalRoute    prodJournalRoute;
+        ProdJournalTable    prodJournalTable;
+        InventDim           inventDim;
+        InventLocation          InventLocation;
+        ProdTable           prodTable;
+
+        progress.setText(tablePName(ProdJournalRoute));
+        progress.incCount();
+
+        setPrefix(tableId2pname(prodJournalRoute.TableId));
+
+        try
+        {
+            line = 0;
+            while select optimisticlock prodJournalRoute
+                join TableId from prodJournalTable
+                where prodJournalTable.JournalId == prodJournalRoute.JournalId
+                   && prodJournalTable.Posted    != NoYes::Yes
+                join TableId from prodTable
+                where prodTable.ProdId == prodJournalRoute.ProdId
+                join TableId from inventDim
+                where inventDim.InventDimId == prodTable.InventDimId
+                join InventLocation
+                where InventLocation.InventLocationId == inventDim.InventLocationId
+            {
+                setPrefix(this.getRecordPrefix(prodJournalRoute, [fieldNum(ProdJournalRoute,ProdId),fieldNum(ProdJournalRoute,JournalId),fieldNum(ProdJournalRoute,LineNum)]));
+                this.updateDimension(prodJournalRoute, InventLocation);
+            }
+            if (line != 0)
+            {
+                ttscommit;
+            }
+        }
+        catch (Exception::Deadlock)
+        {
+            retry;
+        }
+        catch (Exception::UpdateConflict)
+        {
+            if (appl.ttsLevel() == 0)
+            {
+                if (xSession::currentRetryCount() >= #RetryNum)
+                {
+                    throw Exception::UpdateConflictNotRecovered;
+                }
+                else
+                {
+                    retry;
+                }
+            }
+            else
+            {
+                throw Exception::UpdateConflict;
+            }
+        }
+        catch (Exception::Error)
+        {
+            this.manageUpdateError(prodJournalRoute);
+            retry;
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>updateProdRoute</Name>
+				<Source><![CDATA[
+    protected void updateProdRoute()
+    {
+        ProdRoute   prodRoute;
+        ProdTable   prodTable;
+        InventDim   inventDim;
+        InventLocation  InventLocation;
+
+        progress.setText(tablePName(ProdRoute));
+        progress.incCount();
+
+        setPrefix(tableId2pname(prodRoute.TableId));
+
+        try
+        {
+            line = 0;
+            while select optimisticlock prodRoute
+                join TableId from prodTable
+                where prodTable.ProdId == prodRoute.ProdId
+                   && prodTable.ProdStatus != ProdStatus::Completed
+                join TableId from inventDim
+                where inventDim.InventDimId == prodTable.InventDimId
+                join InventLocation
+                where InventLocation.InventLocationId == inventDim.InventLocationId
+            {
+                setPrefix(this.getRecordPrefix(prodRoute, [fieldNum(ProdRoute,ProdId),fieldNum(ProdRoute,OprNum)]));
+                this.updateDimension(prodRoute, InventLocation);
+            }
+            if (line != 0)
+            {
+                ttscommit;
+            }
+        }
+        catch (Exception::Deadlock)
+        {
+            retry;
+        }
+        catch (Exception::UpdateConflict)
+        {
+            if (appl.ttsLevel() == 0)
+            {
+                if (xSession::currentRetryCount() >= #RetryNum)
+                {
+                    throw Exception::UpdateConflictNotRecovered;
+                }
+                else
+                {
+                    retry;
+                }
+            }
+            else
+            {
+                throw Exception::UpdateConflict;
+            }
+        }
+        catch (Exception::Error)
+        {
+            this.manageUpdateError(prodRoute);
+            retry;
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>updateProdTable</Name>
+				<Source><![CDATA[
+    protected void updateProdTable()
+    {
+        ProdTable   prodTable;
+        InventDim   inventDim;
+        InventLocation  InventLocation;
+
+        progress.setText(tablePName(ProdTable));
+        progress.incCount();
+
+        setPrefix(tableId2pname(prodTable.TableId));
+
+        try
+        {
+            line = 0;
+            while select optimisticlock prodTable
+                where prodTable.ProdStatus != ProdStatus::Completed
+                join TableId from inventDim
+                where inventDim.InventDimId == prodTable.InventDimId
+                join InventLocation
+                where InventLocation.InventLocationId == inventDim.InventLocationId
+            {
+                setPrefix(this.getRecordPrefix(prodTable, [fieldNum(ProdTable,ProdId)]));
+                this.updateDimension(prodTable, InventLocation);
+            }
+            if (line != 0)
+            {
+                ttscommit;
+            }
+        }
+        catch (Exception::Deadlock)
+        {
+            retry;
+        }
+        catch (Exception::UpdateConflict)
+        {
+            if (appl.ttsLevel() == 0)
+            {
+                if (xSession::currentRetryCount() >= #RetryNum)
+                {
+                    throw Exception::UpdateConflictNotRecovered;
+                }
+                else
+                {
+                    retry;
+                }
+            }
+            else
+            {
+                throw Exception::UpdateConflict;
+            }
+        }
+        catch (Exception::Error)
+        {
+            this.manageUpdateError(prodTable);
+            retry;
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>updatePurchLine</Name>
+				<Source><![CDATA[
+    protected void updatePurchLine()
+    {
+        PurchLine   purchLine;
+        InventDim   inventDim;
+        InventLocation  InventLocation;
+
+        progress.setText(tablePName(PurchLine));
+        progress.incCount();
+
+        setPrefix(tableId2pname(purchLine.TableId));
+
+        try
+        {
+            line = 0;
+            while select optimisticlock purchLine
+                where purchLine.PurchStatus != PurchStatus::Invoiced
+                   && purchLine.PurchStatus != PurchStatus::Canceled
+                   && purchLine.StockedProduct
+                   && !purchLine.IsDeleted
+                join TableId from inventDim
+                where inventDim.InventDimId == purchLine.InventDimId
+                join InventLocation
+                where InventLocation.InventLocationId == inventDim.InventLocationId
+            {
+                setPrefix(this.getRecordPrefix(purchLine, [fieldNum(PurchLine,PurchId),fieldNum(PurchLine,ItemId)]));
+                this.updateDimension(purchLine, InventLocation, true);
+            }
+            if (line != 0)
+            {
+                ttscommit;
+            }
+        }
+        catch (Exception::Deadlock)
+        {
+            retry;
+        }
+        catch (Exception::UpdateConflict)
+        {
+            if (appl.ttsLevel() == 0)
+            {
+                if (xSession::currentRetryCount() >= #RetryNum)
+                {
+                    throw Exception::UpdateConflictNotRecovered;
+                }
+                else
+                {
+                    retry;
+                }
+            }
+            else
+            {
+                throw Exception::UpdateConflict;
+            }
+        }
+        catch (Exception::Error)
+        {
+            this.manageUpdateError(purchLine);
+            retry;
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>updatePurchReqLine</Name>
+				<Source><![CDATA[
+    protected void updatePurchReqLine()
+    {
+        PurchReqLine purchReqLine;
+        InventDim    inventDim;
+        InventLocation   InventLocation;
+
+        progress.setText(tablePName(PurchReqLine));
+        progress.incCount();
+
+        setPrefix(tableId2pname(purchReqLine.TableId));
+
+        try
+        {
+            line = 0;
+            while select optimisticlock purchReqLine
+                where purchReqLine.PurchLineCreated  == NoYes::No
+                   && purchReqLine.RequisitionStatus != PurchReqRequisitionStatus::Cancelled
+                   && purchReqLine.RequisitionStatus != PurchReqRequisitionStatus::Rejected
+                   && purchReqLine.RequisitionStatus != PurchReqRequisitionStatus::Closed
+                join TableId from inventDim
+                where inventDim.InventDimId == purchReqLine.InventDimId
+                join InventLocation
+                where InventLocation.InventLocationId == inventDim.InventLocationId
+            {
+                setPrefix(this.getRecordPrefix(purchReqLine, [fieldNum(PurchReqLine,PurchReqTable),fieldNum(PurchReqLine,LineNum)]));
+                this.updateDimension(purchReqLine, InventLocation, true);
+            }
+            if (line != 0)
+            {
+                ttscommit;
+            }
+        }
+        catch (Exception::Deadlock)
+        {
+            retry;
+        }
+        catch (Exception::UpdateConflict)
+        {
+            if (appl.ttsLevel() == 0)
+            {
+                if (xSession::currentRetryCount() >= #RetryNum)
+                {
+                    throw Exception::UpdateConflictNotRecovered;
+                }
+                else
+                {
+                    retry;
+                }
+            }
+            else
+            {
+                throw Exception::UpdateConflict;
+            }
+        }
+        catch (Exception::Error)
+        {
+            this.manageUpdateError(purchReqLine);
+            retry;
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>updatePurchRFQCaseLine</Name>
+				<Source><![CDATA[
+    protected void updatePurchRFQCaseLine()
+    {
+        PurchRFQCaseLine   purchRFQCaseLine;
+        InventDim   inventDim;
+        InventLocation  InventLocation;
+
+        progress.setText(tablePName(PurchRFQCaseLine));
+        progress.incCount();
+
+        setPrefix(tableId2pname(purchRFQCaseLine.TableId));
+
+        try
+        {
+            line = 0;
+            while select optimisticlock purchRFQCaseLine
+                where purchRFQCaseLine.StatusHigh != PurchRFQStatus::Accepted
+                   && purchRFQCaseLine.StatusHigh != PurchRFQStatus::Rejected
+                   && purchRFQCaseLine.StatusHigh != PurchRFQStatus::Canceled
+                   && purchRFQCaseLine.StatusLow  != PurchRFQStatus::Accepted
+                   && purchRFQCaseLine.StatusLow  != PurchRFQStatus::Rejected
+                   && purchRFQCaseLine.StatusLow  != PurchRFQStatus::Canceled
+                join TableId from inventDim
+                where inventDim.InventDimId == purchRFQCaseLine.InventDimId
+                join InventLocation
+                where InventLocation.InventLocationId == inventDim.InventLocationId
+            {
+                setPrefix(this.getRecordPrefix(purchRFQCaseLine, [fieldNum(PurchRFQCaseLine,rfqCaseId),fieldNum(PurchRFQCaseLine,LineNum)]));
+                this.updateDimension(purchRFQCaseLine, InventLocation);
+            }
+            if (line != 0)
+            {
+                ttscommit;
+            }
+        }
+        catch (Exception::Deadlock)
+        {
+            retry;
+        }
+        catch (Exception::UpdateConflict)
+        {
+            if (appl.ttsLevel() == 0)
+            {
+                if (xSession::currentRetryCount() >= #RetryNum)
+                {
+                    throw Exception::UpdateConflictNotRecovered;
+                }
+                else
+                {
+                    retry;
+                }
+            }
+            else
+            {
+                throw Exception::UpdateConflict;
+            }
+        }
+        catch (Exception::Error)
+        {
+            this.manageUpdateError(purchRFQCaseLine);
+            retry;
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>updatePurchRFQLine</Name>
+				<Source><![CDATA[
+    protected void updatePurchRFQLine()
+    {
+        PurchRFQLine   purchRFQLine;
+        InventDim   inventDim;
+        InventLocation  InventLocation;
+
+        progress.setText(tablePName(PurchRFQLine));
+        progress.incCount();
+
+        setPrefix(tableId2pname(purchRFQLine.TableId));
+
+        try
+        {
+            line = 0;
+            while select optimisticlock purchRFQLine
+                where purchRFQLine.Status   != PurchRFQStatus::Accepted
+                   && purchRFQLine.Status   != PurchRFQStatus::Rejected
+                   && purchRFQLine.Status   != PurchRFQStatus::Canceled
+                join TableId from inventDim
+                where inventDim.InventDimId == purchRFQLine.InventDimId
+                join InventLocation
+                where InventLocation.InventLocationId == inventDim.InventLocationId
+            {
+                setPrefix(this.getRecordPrefix(purchRFQLine, [fieldNum(PurchRFQLine,rfqId),fieldNum(PurchRFQLine,LineNum)]));
+                this.updateDimension(purchRFQLine, InventLocation);
+            }
+            if (line != 0)
+            {
+                ttscommit;
+            }
+        }
+        catch (Exception::Deadlock)
+        {
+            retry;
+        }
+        catch (Exception::UpdateConflict)
+        {
+            if (appl.ttsLevel() == 0)
+            {
+                if (xSession::currentRetryCount() >= #RetryNum)
+                {
+                    throw Exception::UpdateConflictNotRecovered;
+                }
+                else
+                {
+                    retry;
+                }
+            }
+            else
+            {
+                throw Exception::UpdateConflict;
+            }
+        }
+        catch (Exception::Error)
+        {
+            this.manageUpdateError(purchRFQLine);
+            retry;
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>updateSalesLine</Name>
+				<Source><![CDATA[
+    protected void updateSalesLine()
+    {
+        SalesLine   salesLine;
+        InventDim   inventDim;
+        InventLocation  InventLocation;
+
+        progress.setText(tablePName(SalesLine));
+        progress.incCount();
+
+        setPrefix(tableId2pname(salesLine.TableId));
+
+        try
+        {
+            line = 0;
+            while select optimisticlock salesLine
+                where salesLine.SalesStatus == SalesStatus::None
+                    || salesLine.SalesStatus == SalesStatus::Backorder
+                    || salesLine.SalesStatus == SalesStatus::Delivered
+                join TableId from inventDim
+                    where inventDim.InventDimId == salesLine.InventDimId
+                join InventLocation
+                    where InventLocation.InventLocationId == inventDim.InventLocationId
+            {
+                setPrefix(this.getRecordPrefix(salesLine, [fieldNum(SalesLine,SalesId),fieldNum(SalesLine,ItemId)]));
+                this.updateDimension(salesLine, InventLocation);
+            }
+            if (line != 0)
+            {
+                ttscommit;
+            }
+        }
+        catch (Exception::Deadlock)
+        {
+            retry;
+        }
+        catch (Exception::UpdateConflict)
+        {
+            if (appl.ttsLevel() == 0)
+            {
+                if (xSession::currentRetryCount() >= #RetryNum)
+                {
+                    throw Exception::UpdateConflictNotRecovered;
+                }
+                else
+                {
+                    retry;
+                }
+            }
+            else
+            {
+                throw Exception::UpdateConflict;
+            }
+        }
+        catch (Exception::Error)
+        {
+            this.manageUpdateError(salesLine);
+            retry;
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>updateSalesQuotationLine</Name>
+				<Source><![CDATA[
+    protected void updateSalesQuotationLine()
+    {
+        SalesQuotationLine   salesQuotationLine;
+        InventDim   inventDim;
+        InventLocation  InventLocation;
+
+        progress.setText(tablePName(SalesQuotationLine));
+        progress.incCount();
+
+        setPrefix(tableId2pname(salesQuotationLine.TableId));
+
+        try
+        {
+            line = 0;
+            while select optimisticlock salesQuotationLine
+                where salesQuotationLine.QuotationStatus != SalesQuotationStatus::Cancelled
+                   && salesQuotationLine.QuotationStatus != SalesQuotationStatus::Lost
+                   && salesQuotationLine.QuotationStatus != SalesQuotationStatus::Confirmed
+                join TableId from inventDim
+                where inventDim.InventDimId == salesQuotationLine.InventDimId
+                join InventLocation
+                where InventLocation.InventLocationId == inventDim.InventLocationId
+            {
+                setPrefix(this.getRecordPrefix(salesQuotationLine, [fieldNum(SalesQuotationLine,QuotationId),fieldNum(SalesQuotationLine,LineNum)]));
+                this.updateDimension(salesQuotationLine, InventLocation);
+            }
+            if (line != 0)
+            {
+                ttscommit;
+            }
+        }
+        catch (Exception::Deadlock)
+        {
+            retry;
+        }
+        catch (Exception::UpdateConflict)
+        {
+            if (appl.ttsLevel() == 0)
+            {
+                if (xSession::currentRetryCount() >= #RetryNum)
+                {
+                    throw Exception::UpdateConflictNotRecovered;
+                }
+                else
+                {
+                    retry;
+                }
+            }
+            else
+            {
+                throw Exception::UpdateConflict;
+            }
+        }
+        catch (Exception::Error)
+        {
+            this.manageUpdateError(salesQuotationLine);
+            retry;
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>updateSMAAgreementLine</Name>
+				<Source><![CDATA[
+    protected void updateSMAAgreementLine()
+    {
+        SMAAgreementLine   smaAgreementLine;
+        InventDim   inventDim;
+        InventLocation  InventLocation;
+
+        progress.setText(tablePName(SMAAgreementLine));
+        progress.incCount();
+
+        setPrefix(tableId2pname(smaAgreementLine.TableId));
+
+        try
+        {
+            line = 0;
+            while select optimisticlock smaAgreementLine
+                where smaAgreementLine.TransactionType == SMATransactionType::Item
+                   && smaAgreementLine.Suspended != NoYes::Yes
+                   && (!smaAgreementLine.EndDate || smaAgreementLine.EndDate >= DateTimeUtil::getSystemDate(DateTimeUtil::getUserPreferredTimeZone()))
+                join TableId from inventDim
+                where inventDim.InventDimId == smaAgreementLine.InventDimId
+                join InventLocation
+                where InventLocation.InventLocationId == inventDim.InventLocationId
+            {
+                setPrefix(this.getRecordPrefix(smaAgreementLine, [fieldNum(SMAAgreementLine,AgreementId),fieldNum(SMAAgreementLine,AgreementLineNum)]));
+                this.updateDimension(smaAgreementLine, InventLocation);
+            }
+            if (line != 0)
+            {
+                ttscommit;
+            }
+        }
+        catch (Exception::Deadlock)
+        {
+            retry;
+        }
+        catch (Exception::UpdateConflict)
+        {
+            if (appl.ttsLevel() == 0)
+            {
+                if (xSession::currentRetryCount() >= #RetryNum)
+                {
+                    throw Exception::UpdateConflictNotRecovered;
+                }
+                else
+                {
+                    retry;
+                }
+            }
+            else
+            {
+                throw Exception::UpdateConflict;
+            }
+        }
+        catch (Exception::Error)
+        {
+            this.manageUpdateError(smaAgreementLine);
+            retry;
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>updateSMAServiceOrderLine</Name>
+				<Source><![CDATA[
+    protected void updateSMAServiceOrderLine()
+    {
+        SMAServiceOrderLine   smaServiceOrderLine;
+        InventDim   inventDim;
+        InventLocation  InventLocation;
+
+        progress.setText(tablePName(SMAServiceOrderLine));
+        progress.incCount();
+
+        setPrefix(tableId2pname(smaServiceOrderLine.TableId));
+
+        try
+        {
+            line = 0;
+            while select optimisticlock smaServiceOrderLine
+                where smaServiceOrderLine.TransactionType == SMATransactionType::Item
+                   && smaServiceOrderLine.ServiceOrderStatus != SMAServiceOrderStatus::Canceled
+                   && smaServiceOrderLine.ServiceOrderStatus != SMAServiceOrderStatus::Posted
+                join TableId from inventDim
+                where inventDim.InventDimId == smaServiceOrderLine.InventDimId
+                join InventLocation
+                where InventLocation.InventLocationId == inventDim.InventLocationId
+            {
+                setPrefix(this.getRecordPrefix(smaServiceOrderLine, [fieldNum(SMAServiceOrderLine,ServiceOrderId),fieldNum(SMAServiceOrderLine,ServiceOrderLineNum)]));
+                this.updateDimension(smaServiceOrderLine, InventLocation);
+            }
+            if (line != 0)
+            {
+                ttscommit;
+            }
+        }
+        catch (Exception::Deadlock)
+        {
+            retry;
+        }
+        catch (Exception::UpdateConflict)
+        {
+            if (appl.ttsLevel() == 0)
+            {
+                if (xSession::currentRetryCount() >= #RetryNum)
+                {
+                    throw Exception::UpdateConflictNotRecovered;
+                }
+                else
+                {
+                    retry;
+                }
+            }
+            else
+            {
+                throw Exception::UpdateConflict;
+            }
+        }
+        catch (Exception::Error)
+        {
+            this.manageUpdateError(smaServiceOrderLine);
+            retry;
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>validate</Name>
+				<Source><![CDATA[
+    public boolean validate(Object calledFrom = null)
+    {
+        boolean ret = super(calledFrom);
+
+        if (ret)
+        {
+            if (InventParameters.AAX_isLocationDimensionLinkInactive())
+            {
+                ret = checkFailed("@SYS111443");
+            }
+        }
+        return ret;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>construct</Name>
+				<Source><![CDATA[
+    public server static AAX_InventLocationDimensionUpdate construct()
+    {
+        return new AAX_InventLocationDimensionUpdate();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>description</Name>
+				<Source><![CDATA[
+    static public ClassDescription description()
+    {
+        return "@SYS111444";
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>main</Name>
+				<Source><![CDATA[
+    public static void main(Args args)
+    {
+        AAX_InventLocationDimensionUpdate   AAX_InventLocationDimensionUpdate = AAX_InventLocationDimensionUpdate::construct();
+
+        if (AAX_InventLocationDimensionUpdate.prompt())
+        {
+            AAX_InventLocationDimensionUpdate.run();
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>canRunInNewSession</Name>
+				<Source><![CDATA[
+    protected boolean canRunInNewSession()
+    {
+        return true;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

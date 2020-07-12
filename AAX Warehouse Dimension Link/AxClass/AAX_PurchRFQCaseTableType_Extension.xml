@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>AAX_PurchRFQCaseTableType_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(classStr(PurchRfqCaseTableType))]
+public final class AAX_PurchRFQCaseTableType_Extension
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>validateField</Name>
+				<Source><![CDATA[
+    public boolean validateField(FieldId _fieldId)
+    {
+        boolean  ret = true;
+
+        switch (_fieldId)
+        {
+            case fieldNum(PurchRFQCaseTable, InventLocationId):
+                ret = purchRFQCaseTable.AAX_InventStorageDimMap::validateField(fieldNum(AAX_InventStorageDimMap, InventLocationId));
+                break;
+        }
+
+        return next validateField(_fieldId) && ret;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

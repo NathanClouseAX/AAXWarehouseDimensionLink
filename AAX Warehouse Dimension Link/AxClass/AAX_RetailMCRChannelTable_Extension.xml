@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>AAX_RetailMCRChannelTable_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(tableStr(RetailMCRChannelTable))]
+public final class AAX_RetailMCRChannelTable_Extension
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>modifiedField</Name>
+				<Source><![CDATA[
+    public void modifiedField(FieldId _fieldId)
+    {
+        switch (_fieldId)
+        {
+            case fieldNum(RetailMCRChannelTable, InventLocation) :
+                this.AAX_InventStorageDimMapRetail::modifiedField(fieldNum(AAX_InventStorageDimMapRetail, InventLocationId), this.InventLocationDataAreaId);
+                break;
+
+        }
+
+        next modifiedField(_fieldId);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>validateField</Name>
+				<Source><![CDATA[
+    public boolean validateField(FieldId _fieldIdToCheck)
+    {
+        boolean                     ret = true;
+
+        if (ret)
+        {
+            switch (_fieldIdToCheck)
+            {
+                case fieldNum(RetailMCRChannelTable, InventLocation) :
+                    ret = this.AAX_InventStorageDimMapRetail::validateField(fieldNum(AAX_InventStorageDimMapRetail, InventLocationId), this.InventLocationDataAreaId);
+                    break;
+            }
+
+        }
+
+        return next validateField(_fieldIdToCheck) && ret;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

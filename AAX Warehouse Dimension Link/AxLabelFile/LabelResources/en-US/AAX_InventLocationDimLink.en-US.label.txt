@@ -1,0 +1,14 @@
+﻿NewLabel0=Label files created on 09/02/2018 12:22:06 for label file Id AAX_InventLocationDimLink and language en-US
+ ;Label file comment - see above label
+UpdateWarehouseFinDims=Update Warehouse Financial Dimensions
+ ;New Comment
+UpdateWarehouseFinDimsHelp=Updates warehouse financial dimensions values to equal the warehouse
+ ;New Comment
+WarehouseDimLinkHelp1=When the Warehouse dimension link is active, the value of the selected dimension on all transactions will be determined based on the value of the Warehouse storage dimension. However, transactions may still be posted regardless of the dimension value.
+ ;New Comment
+WarehouseDimLinkHelp2=When the Warehouse dimension link is locked, transactions can only be posted if the value of the selected dimension matches the value associated with the Warehouse storage dimension. Hence, all open transactions must be updated before the dimension link can be locked.
+ ;New Comment
+WarehouseDimensionLink=Warehouse Dimension Link
+ ;New Comment
+WrehouseDimLinkSelect=Select the dimension to be linked to the storage dimension, Warehouse.
+ ;New Comment

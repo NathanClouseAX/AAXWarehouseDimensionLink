@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>AAX_VendTable_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(tableStr(VendTable))]
+public final class AAX_VendTable_Extension
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>validateField</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name = "p1"></param>
+    /// <returns></returns>
+    boolean validateField(FieldId p1)
+    {
+        boolean ret = true;
+
+        if (ret)
+        {
+            switch (p1)
+            {
+                
+                case fieldNum(VendTable, InventLocation) :
+                    ret = this.InventStorageDimMap::validateField(fieldNum(InventStorageDimMap, InventLocationId));
+                    break;
+
+            }
+        }
+
+        return next validateField(p1) && ret;
+
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>defaultFieldWithChangeControl</Name>
+				<Source><![CDATA[
+    public void defaultFieldWithChangeControl(FieldId _fieldId, boolean _bypassChangeControl)
+    {
+        switch (_fieldId)
+        {
+            case fieldNum(VendTable, InventSiteId): 
+                this.AAX_InventStorageDimMap::modifiedField(fieldNum(AAX_InventStorageDimMap, InventLocationId));
+                break;
+            case fieldNum(VendTable, InventLocation): 
+                this.AAX_InventStorageDimMap::modifiedField(fieldNum(AAX_InventStorageDimMap, InventSiteId));
+                break;            
+        }
+
+        next defaultFieldWithChangeControl(_fieldId, _bypassChangeControl);
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>AAX_UpdateWarehouseDimensions</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+class AAX_UpdateWarehouseDimensions
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>main</Name>
+				<Source><![CDATA[
+    public static void main(Args _args)
+    {
+        InventLocation InventLocation;
+
+        DimensionDefault DefDim;
+        DimensionAttribute                  dimensionAttribute;
+        DimensionAttributeValue             newValue;
+        DimensionAttributeValueSetStorage   dimensionStorage;
+
+        int counter;
+
+        if(InventParameters::find().AAX_isLocationDimensionLinkInactive())
+        {
+            while select forUpdate * from InventLocation
+            {
+                ttsBegin;
+                dimensionAttribute = DimensionAttribute::find(InventParameters::find().AAX_LocationDimensionAttribute);
+                DefDim = InventLocation.AAX_DefaultDimension;
+
+                newValue = DimensionAttributeValue::findByDimensionAttributeAndValue(dimensionAttribute, InventLocation.InventLocationId,false,true);
+
+                dimensionStorage = DimensionAttributeValueSetStorage::find(DefDim);
+                dimensionStorage.addItem(newValue);
+
+                DefDim = dimensionStorage.save();
+
+
+                InventLocation.AAX_DefaultDimension = DefDim;
+                InventLocation.Update();
+                ttsCommit;
+
+                counter++;
+            }
+            DimensionCache::clearAllScopes();
+            DimensionCache::clearLedgerDimensionCache();
+        }
+
+        Message::Add(MessageSeverity::Informational, strFmt("%1 %2 %3.", counter, "@SYS7122", "@ApplicationIntegration:IntegrationExecutionHistoryNumberUpdated"));
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

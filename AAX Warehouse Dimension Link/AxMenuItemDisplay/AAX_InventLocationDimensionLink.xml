@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxMenuItemDisplay xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="Microsoft.Dynamics.AX.Metadata.V1">
+	<Name>AAX_InventLocationDimensionLink</Name>
+	<ConfigurationKey>LogisticsBasic</ConfigurationKey>
+	<DisabledResource>0</DisabledResource>
+	<Label>Warehouse Dimension Link</Label>
+	<MaintainUserLicense>Enterprise</MaintainUserLicense>
+	<NormalResource>0</NormalResource>
+	<Object>AAX_InventLocationDimensionLink</Object>
+	<ViewUserLicense>Universal</ViewUserLicense>
+</AxMenuItemDisplay>

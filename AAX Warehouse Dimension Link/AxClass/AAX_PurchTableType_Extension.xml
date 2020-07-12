@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>AAX_PurchTableType_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(classStr(PurchTableType))]
+public final class AAX_PurchTableType_Extension
+{
+    
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>validateField</Name>
+				<Source><![CDATA[
+    boolean  validateField(FieldId  fieldId)
+    {
+        boolean  ok = true;
+        // <GEERU>
+        PurchTable_RU   purchTable_RU;
+        // </GEERU>
+
+        switch (fieldId)
+        {
+
+            case fieldNum(PurchTable, InventLocationId):    
+                ok = purchTable.AAX_InventStorageDimMap::validateField(fieldNum(AAX_InventStorageDimMap, InventLocationId));
+                break;
+        }
+
+        return next ValidateField(fieldId);
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

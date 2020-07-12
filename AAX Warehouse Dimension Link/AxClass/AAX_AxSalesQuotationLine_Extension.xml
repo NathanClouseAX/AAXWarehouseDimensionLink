@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>AAX_AxSalesQuotationLine_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(classStr(AxSalesQuotationLine))]
+public final class AAX_AxSalesQuotationLine_Extension
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>setDefaultDimension</Name>
+				<Source><![CDATA[
+    protected void setDefaultDimension()
+    {
+        this.AAX_InventLocationDimensionLink().axSetDefaultDimension(this);
+
+        next setDefaultDimension();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>AAX_InventLocationDimensionLink</Name>
+				<Source><![CDATA[
+    public AAX_InventLocationDimensionLink AAX_InventLocationDimensionLink()
+    {
+        return AAX_InventLocationDimensionLink::newDimensionTables(this.salesQuotationLine(), this.axInventDim().inventDim());
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

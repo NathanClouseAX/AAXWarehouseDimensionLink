@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxMap xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>AAX_InventStorageDimMap</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+public class AAX_InventStorageDimMap extends InventStorageDimMap
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>formDataSourceJoinParent</Name>
+				<Source><![CDATA[
+    /// <summary>
+    ///    Finds and returns the parent data source in the form for this table buffer.
+    /// </summary>
+    /// <returns>
+    ///    A <c>Common</c> table buffer; otherwise, a null buffer.
+    /// </returns>
+    public Common formDataSourceJoinParent()
+    {
+        FormDataSource  parentDataSource;
+        Common          parent;
+        Counter         i;
+        Counter         dataSourceCount;
+
+        void findSpecificTableSource(TableId _tableId)
+        {
+            // ...we are in an exceptional situation where there is no parent datasource. We specify it manually.
+            // Locate the datasource (that contains the ItemId we will need)
+            dataSourceCount = FormDataUtil::getFormDataSource(this).formRun().dataSourceCount();
+
+            for (i=1;i <= dataSourceCount;i++)
+            {
+                if (FormDataUtil::getFormDataSource(this).formRun().dataSource(i).cursor().TableId == _tableId)
+                {
+                    parent = FormDataUtil::getFormDataSource(this).formRun().dataSource(i).cursor();
+                    return;
+                }
+            }
+        }
+
+        if (FormDataUtil::isFormDataSource(this))
+        {
+            parentDataSource = formGetParentDatasource(FormDataUtil::getFormDataSource(this),true);
+            if (parentDataSource)
+            {
+                parent = parentDataSource.cursor();
+            }
+            else
+            {
+                switch (FormDataUtil::getFormDataSource(this).formRun().name())
+                {
+                    case formStr(ProdTableCreate):
+                        findSpecificTableSource(tableNum(ProdTable));
+                        break;
+                    case formStr(InventQualityOrderTableCreate):
+                        findSpecificTableSource(tableNum(InventQualityOrderTable));
+                        break;
+                }
+            }
+        }
+
+        return parent;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>initFromInventLocation</Name>
+				<Source><![CDATA[
+    public void initFromInventLocation(InventLocation  _inventLocation)
+    {
+        if (!_inventLocation.RecId)
+        {
+            return; // Nothing to initialize
+        }
+
+        this.InventLocationId  = _inventLocation.InventLocationId;
+
+        if (FormDataUtil::isFormDataSource(this))
+        {
+            this.AAX_InventStorageDimMap::modifiedInventSiteFromParent(this.AAX_InventStorageDimMap::formDataSourceJoinParent());
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>modifiedField</Name>
+				<Source><![CDATA[
+    public void modifiedField(FieldId _fieldId)
+    {
+        switch (_fieldId)
+        {
+            case fieldNum(AAX_InventStorageDimMap,InventSiteId):
+                if (this.InventLocationId
+                 && this.InventSiteId != InventLocation::find(this.InventLocationId).InventSiteId)
+                {
+                    this.InventLocationId = '';
+                }
+
+                if (FormDataUtil::isFormDataSource(this))
+                {
+                    this.AAX_InventStorageDimMap::modifiedInventSiteFromParent(this.AAX_InventStorageDimMap::formDataSourceJoinParent());
+                }
+                break;
+
+            case fieldNum(AAX_InventStorageDimMap,InventLocationId):
+                if (this.InventLocationId) 
+                {
+                    if (FormDataUtil::isFormDataSource(this))
+                    {
+                        this.AAX_InventStorageDimMap::modifiedInventLocationFromParent(this.AAX_InventStorageDimMap::formDataSourceJoinParent());
+                    }
+                }
+                break;
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>defaultField</Name>
+				<Source><![CDATA[
+    public void defaultField(FieldId _fieldId)
+    {
+        super(_fieldId);
+         
+        switch (_fieldId)
+        {
+            case fieldNum(InventStorageDimMap,InventSiteId):
+                if (this.InventLocationId && !this.InventSiteId) // No site. Hence default site might be applicable
+                {
+                    this.AAX_InventStorageDimMap::modifiedInventLocationFromParent(null);
+                }
+                break;
+
+            case fieldNum(InventStorageDimMap,InventLocationId):
+                if (this.InventLocationId
+                    && this.InventSiteId != InventLocation::find(this.InventLocationId).InventSiteId)
+                {
+                    this.InventLocationId = '';
+                }
+
+                this.AAX_InventStorageDimMap::modifiedInventSiteFromParent(null);
+                break;
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>modifiedInventLocationFromParent</Name>
+				<Source><![CDATA[
+    public void modifiedInventLocationFromParent(Common  _parent)
+    {
+        if (_parent.TableId)
+        {
+            switch (_parent.TableId)
+            {
+                case tableNum(InventItemLocation):
+                    return;
+                default:
+                    break;
+            }
+        }
+
+        this.AAX_InventStorageDimMap::initFromInventLocation(InventLocation::find(this.InventLocationId));
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>modifiedInventSiteFromParent</Name>
+				<Source><![CDATA[
+    /// <summary>
+    ///    Populates values on the current or the parent record when the <c>InventSiteId</c> field is modified.
+    /// </summary>
+    /// <param name="_parent">
+    ///    The parent record buffer if the current records is innerjoined; optional.
+    /// </param>
+    public void modifiedInventSiteFromParent(Common _parent = null)
+    {
+        AAX_InventLocationDimensionLink  AAX_InventLocationDimensionLink;
+        
+        
+        if (this.TableId == tableNum(InventDim) && _parent.TableId && _parent.TableId != tableNum(Common))
+        {
+            AAX_InventLocationDimensionLink = AAX_InventLocationDimensionLink::newDimensionTables(_parent, this);
+
+            if (!this.InventLocationId)
+            {
+                this.InventLocationId = this.AAX_InventStorageDimMap::inventLocationIdFromParent(_parent);
+            }
+        }
+        else
+        {
+            AAX_InventLocationDimensionLink = AAX_InventLocationDimensionLink::newDimensionTables(this, this);
+        }
+
+        AAX_InventLocationDimensionLink.linkDimension();
+        
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>inventLocationIdFromParent</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Returns the <c>InventLocationId</c> using the parent record.
+    /// </summary>
+    /// <param name = "_parent">The parent record buffer if the current records is innerjoined</param>
+    /// <returns>The <c>InventLocationId</c>.</returns>
+    protected InventLocationId inventLocationIdFromParent(Common _parent)
+    {
+        
+        FieldId itemIdFieldId = fieldName2id(_parent.TableId, fieldStr(InventTable, ItemId));
+        ItemId  itemId;
+
+        if (itemIdFieldId)
+        {
+            itemId = _parent.(itemIdFieldId);
+        }
+
+        if (itemId)
+        {
+            InventDim inventDim;
+            inventDim.InventSiteId = this.InventSiteId;
+            switch (_parent.TableId)
+            {
+                case tableNum(SalesLine):
+                case tableNum(SalesQuotationLine):
+                case tableNum(ForecastSales):
+                    return InventTable::find(itemId).salesInventLocationId('', InventDim::findOrCreate(inventDim).InventDimId, this.InventSiteId);
+
+                case tableNum(PurchLine):
+                case tableNum(TmpPurchLine):
+                case tableNum(PurchRFQCaseLine):
+                case tableNum(PurchRFQLine):
+                case tableNum(VendInvoiceInfoLine):
+                case tableNum(ForecastPurch):
+                    return InventTable::find(itemId).purchInventLocationId('', InventDim::findOrCreate(inventDim).InventDimId, this.InventSiteId);
+                
+                case tableNum(PurchReqLine):
+                    PurchReqLine purchReqLine = _parent as PurchReqLine;
+                    return InventItemOrderSetupMap::find(itemId, purchReqLine.getInventItemOrderSetupType(), InventDim::findOrCreate(inventDim).InventDimId).inventLocationId();
+                
+                case tableNum(AgreementLine):
+                    AgreementLine agreementLine = _parent as AgreementLine;
+
+                    if (agreementLine.agreementModuleType() == ModuleSalesPurch::Sales)
+                    {
+                        return agreementLine.inventTable().salesInventLocationId('', InventDim::findOrCreate(inventDim).InventDimId, this.InventSiteId);
+                    }
+                    else
+                    {
+                        return agreementLine.inventTable().purchInventLocationId('', InventDim::findOrCreate(inventDim).InventDimId, this.InventSiteId);
+                    }
+
+                case tableNum(InventItemPriceSim):
+                case tableNum(InventItemPrice):
+                case tableNum(RouteVersion):
+                case tableNum(BOMVersion):
+                    break;
+
+                default:
+                    return this.AAX_InventStorageDimMap::defaultInventLocationId(_parent);
+            }
+        }
+        
+
+        return '';
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>defaultInventLocationId</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Returns the default <c>InventLocationId</c>.
+    /// </summary>
+    /// <param name = "_parent">The parent record buffer if the current records is innerjoined</param>
+    /// <returns>The default <c>InventLocationId</c></returns>
+    [Replaceable]
+    protected InventLocationId defaultInventLocationId(Common _parent)
+    {
+        InventDim inventDim;
+        inventDim.InventSiteId = this.InventSiteId;
+
+        FieldId itemIdFieldId   = fieldName2id(_parent.TableId, fieldStr(InventTable, ItemId));
+        ItemId  itemId          = _parent.(itemIdFieldId);
+            
+        return InventTable::find(itemId).inventLocationId('', InventDim::findOrCreate(inventDim).InventDimId, this.InventSiteId);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>validateField</Name>
+				<Source><![CDATA[
+    public boolean validateField(FieldId _fieldIdToCheck)
+    {
+        boolean ret;
+
+        ret = super(_fieldIdToCheck);
+
+        switch (_fieldIdToCheck)
+        {
+            case fieldNum(AAX_InventStorageDimMap, InventLocationId):
+
+                if (ret && this.InventSiteId && this.InventLocationId)
+                {
+                    if (InventLocation::find(this.InventLocationId).InventSiteId != this.InventSiteId)
+                    {
+                        ret = checkFailed (strFmt("@SYS104861",this.InventLocationId,this.InventSiteId));
+                    }
+                }
+                break;
+        }
+
+        return ret;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+	<ConfigurationKey>LedgerBasic</ConfigurationKey>
+	<DeveloperDocumentation>@SYS317032</DeveloperDocumentation>
+	<Label>@SYS108784</Label>
+	<FieldGroups />
+	<Fields>
+		<AxMapBaseField xmlns=""
+			i:type="AxMapFieldString">
+			<Name>InventLocationId</Name>
+			<ExtendedDataType>InventLocationId</ExtendedDataType>
+		</AxMapBaseField>
+		<AxMapBaseField xmlns=""
+			i:type="AxMapFieldString">
+			<Name>InventSiteId</Name>
+			<ExtendedDataType>InventSiteId</ExtendedDataType>
+		</AxMapBaseField>
+	</Fields>
+	<Mappings />
+</AxMap>

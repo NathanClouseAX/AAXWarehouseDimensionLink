@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>AAX_PurchTable_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(tableStr(PurchTable))]
+public final class AAX_PurchTable_Extension
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>modifiedFieldWithUserInput</Name>
+				<Source><![CDATA[
+    public void modifiedFieldWithUserInput(
+        FieldId _fieldId,
+        boolean _isFieldSetExplicitlyByUser)
+    {
+
+        switch (_fieldId)
+        {
+            case fieldNum(PurchTable, InventLocationId):
+                this.AAX_InventStorageDimMap::modifiedField(fieldNum(AAX_InventStorageDimMap, InventLocationId));
+                this.setAddressFromInventLocationId(this.InventLocationId);
+                break;
+
+            case fieldNum(PurchTable, InventSiteId):
+                this.AAX_InventStorageDimMap::modifiedField(fieldNum(AAX_InventStorageDimMap, InventSiteId));
+                this.setAddressFromInventSiteId(this.InventSiteId);
+                this.modifiedInventSiteFromParent();
+                break;
+
+            default:
+                break;
+        }
+
+        next modifiedFieldWithUserInput(_fieldId, _isFieldSetExplicitlyByUser);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>modifiedInventSiteFromParent</Name>
+				<Source><![CDATA[
+    public void modifiedInventSiteFromParent(Common _parent)
+    {
+        next modifiedInventSiteFromParent(_parent);
+        
+        this.AAX_InventStorageDimMap::modifiedInventSiteFromParent(_parent);
+
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>initFromVendTable</Name>
+				<Source><![CDATA[
+    public void  initFromVendTable(VendTable _vendTable)
+    {
+        next initFromVendTable(_vendTable);
+
+        this.AAX_InventStorageDimMap::modifiedInventSiteFromParent(_vendTable);
+
+    }
+
+
+    /*
+    public
+    DimensionDefault copyDimension(
+        DimensionDefault _defaultDimension,
+        DimensionCopy    _dimensionCopy = DimensionCopy::newFromTable(this, CompanyInfo::findDataArea(curext()).RecId)
+        )
+    {
+        return _dimensionCopy.copy(_defaultDimension);
+    }
+    */
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>
