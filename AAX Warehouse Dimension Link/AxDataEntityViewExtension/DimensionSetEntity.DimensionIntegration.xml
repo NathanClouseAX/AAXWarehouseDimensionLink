@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxDataEntityViewExtension xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>DimensionSetEntity.DimensionIntegration</Name>
+	<DataSources />
+	<FieldGroupExtensions />
+	<FieldGroups />
+	<FieldModifications />
+	<Fields>
+		<AxDataEntityViewField xmlns=""
+			i:type="AxDataEntityViewUnmappedFieldString">
+			<Name>Site</Name>
+			<ComputedFieldMethod>getValueColumnForDimensionAttributeSql</ComputedFieldMethod>
+			<ExtendedDataType>DimensionValue</ExtendedDataType>
+		</AxDataEntityViewField>
+		<AxDataEntityViewField xmlns=""
+			i:type="AxDataEntityViewUnmappedFieldString">
+			<Name>Warehouse</Name>
+			<ComputedFieldMethod>getValueColumnForDimensionAttributeSql</ComputedFieldMethod>
+			<ExtendedDataType>DimensionValue</ExtendedDataType>
+		</AxDataEntityViewField>
+	</Fields>
+	<Mappings />
+	<PropertyModifications />
+	<Relations />
+</AxDataEntityViewExtension>

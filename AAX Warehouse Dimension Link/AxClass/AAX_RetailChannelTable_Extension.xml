@@ -12,6 +12,10 @@ public final class AAX_RetailChannelTable_Extension
 			<Method>
 				<Name>modifiedField</Name>
 				<Source><![CDATA[
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name = "_fieldId"></param>
     public void modifiedField(FieldId _fieldId)
     {
         switch (_fieldId)
