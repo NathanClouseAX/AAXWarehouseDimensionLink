@@ -1,0 +1,7 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/Projects/AAX_InventLocationDimLink/.vs/AAX_InventLocationDimLink
+/.vs/AAXWarehouseDimensionLink/v17
+/.vs
