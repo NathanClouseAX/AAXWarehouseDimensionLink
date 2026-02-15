@@ -28,9 +28,9 @@ public final class AAX_AxSalesLine_Extension //implements AAX_AxInventLocationDi
 				<Source><![CDATA[
     protected void setDimension()
     {
-        this.AAX_InventLocationDimensionLink().axSetDefaultDimension(this);
-
         next setDimension();
+
+        this.AAX_InventLocationDimensionLink().axSetDefaultDimension(this);
     }
 
 ]]></Source>
