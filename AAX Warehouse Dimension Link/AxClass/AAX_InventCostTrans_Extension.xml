@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>AAX_InventCostTrans_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(tableStr(InventCostTrans))]
+final class AAX_InventCostTrans_Extension
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>initInventCostTrans</Name>
+				<Source><![CDATA[
+    public static InventCostTrans initInventCostTrans(
+        InventCostTransState    _costTransState,
+        InventItemPrice         _inventItemPrice,
+        InventTable             _inventTable,
+        Voucher                 _voucher,
+        TransDate               _transDate,
+        DimensionDefault        _dimension ,
+        InventTrans             _inventTrans,
+        InventDim               _inventDim,
+        InventTransOrigin       _inventTransOrigin,
+        InventCostTransType     _costTransType,
+        LeanCostingFacadeBase   _leanCostingFacade)
+    {   
+        InventCostTrans inventCostTrans;
+        inventCostTrans = next initInventCostTrans(_costTransState,
+                                                   _inventItemPrice,
+                                                   _inventTable,
+                                                   _voucher,
+                                                   _transDate,
+                                                   _dimension,
+                                                   _inventTrans,
+                                                   _inventDim,
+                                                   _inventTransOrigin,
+                                                   _costTransType,
+                                                   _leanCostingFacade);
+
+        //if(!InventParameters::find().AAX_isLocationDimensionLinkInactive())
+        //{
+        //    InventDim inventDimLocal = InventDim::find(inventCostTrans.FinancialInventDimId);
+
+        //    inventDimLocal.InventLocationId = _inventDim.InventLocationId;
+
+        //    inventDimLocal = InventDim::findOrCreate(inventDimLocal);
+
+        //    InventCostTrans.FinancialInventDimId = inventDimLocal.inventDimId;
+
+        //}
+
+        return InventCostTrans;
+        
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

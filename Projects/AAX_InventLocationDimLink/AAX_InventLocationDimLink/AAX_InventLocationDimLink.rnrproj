@@ -36,6 +36,7 @@
   <ItemGroup>
     <Folder Include="Action Menu Items\" />
     <Folder Include="Classes\" />
+    <Folder Include="Data Entity Extensions\" />
     <Folder Include="Display Menu Items\" />
     <Folder Include="Extended Data Types\" />
     <Folder Include="Form Extensions\" />
@@ -117,6 +118,11 @@
       <SubType>Content</SubType>
       <Name>AAX_DimensionCopy_SiteActive_Extension</Name>
       <Link>Classes\AAX_DimensionCopy_SiteActive_Extension</Link>
+    </Content>
+    <Content Include="AxClass\AAX_InventCostTrans_Extension">
+      <SubType>Content</SubType>
+      <Name>AAX_InventCostTrans_Extension</Name>
+      <Link>Classes\AAX_InventCostTrans_Extension</Link>
     </Content>
     <Content Include="AxClass\AAX_InventDimCtrl_Frm_EditDimensions_Extension">
       <SubType>Content</SubType>
@@ -453,6 +459,16 @@
       <Name>AAX_WhsInventMov_Work_Extension</Name>
       <Link>Classes\AAX_WhsInventMov_Work_Extension</Link>
     </Content>
+    <Content Include="AxDataEntityViewExtension\DimensionCombinationEntity.DimensionIntegration">
+      <SubType>Content</SubType>
+      <Name>DimensionCombinationEntity.DimensionIntegration</Name>
+      <Link>Data Entity Extensions\DimensionCombinationEntity.DimensionIntegration</Link>
+    </Content>
+    <Content Include="AxDataEntityViewExtension\DimensionSetEntity.DimensionIntegration">
+      <SubType>Content</SubType>
+      <Name>DimensionSetEntity.DimensionIntegration</Name>
+      <Link>Data Entity Extensions\DimensionSetEntity.DimensionIntegration</Link>
+    </Content>
     <Content Include="AxEdt\AAX_InventLocationLinkedDimensionValueSet">
       <SubType>Content</SubType>
       <Name>AAX_InventLocationLinkedDimensionValueSet</Name>
@@ -498,6 +514,11 @@
       <Name>InventoryManagement.Extension_AAX</Name>
       <Link>Menu Extensions\InventoryManagement.Extension_AAX</Link>
     </Content>
+    <Content Include="AxMenuItemAction\AAX_ClearDimensionCache">
+      <SubType>Content</SubType>
+      <Name>AAX_ClearDimensionCache</Name>
+      <Link>Action Menu Items\AAX_ClearDimensionCache</Link>
+    </Content>
     <Content Include="AxMenuItemAction\AAX_InventLocationDimensionUpdate">
       <SubType>Content</SubType>
       <Name>AAX_InventLocationDimensionUpdate</Name>
@@ -542,6 +563,11 @@
       <SubType>Content</SubType>
       <Name>InventDim.Extension_AAX</Name>
       <Link>Table Extensions\InventDim.Extension_AAX</Link>
+    </Content>
+    <Content Include="AxTableExtension\InventJournalTable.Extension_AAX">
+      <SubType>Content</SubType>
+      <Name>InventJournalTable.Extension_AAX</Name>
+      <Link>Table Extensions\InventJournalTable.Extension_AAX</Link>
     </Content>
     <Content Include="AxTableExtension\InventLocation.Extension_AAX">
       <SubType>Content</SubType>
@@ -605,5 +631,5 @@
     </Content>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.Common.targets" />
-  <Import Project="$(BuildTasksDirectory)\Microsoft.Dynamics.Framework.Tools.BuildTasks.targets" />
+  <Import Project="$(BuildTasksDirectory)\Microsoft.Dynamics.Framework.Tools.BuildTasks.17.0.targets" />
 </Project>

@@ -43,6 +43,7 @@
 		<d2p1:string>PersonnelManagement</d2p1:string>
 		<d2p1:string>PersonnelMobile</d2p1:string>
 		<d2p1:string>Policy</d2p1:string>
+		<d2p1:string>ProcessAutomation</d2p1:string>
 		<d2p1:string>Project</d2p1:string>
 		<d2p1:string>ProjectMobile</d2p1:string>
 		<d2p1:string>PublicSector</d2p1:string>
@@ -62,6 +63,7 @@
 	</ModuleReferences>
 	<Name>AAX Warehouse Dimension Link</Name>
 	<Publisher>www.atomicax.com</Publisher>
+	<SolutionId>00000000-0000-0000-0000-000000000000</SolutionId>
 	<VersionBuild>0</VersionBuild>
 	<VersionMajor>1</VersionMajor>
 	<VersionMinor>0</VersionMinor>
